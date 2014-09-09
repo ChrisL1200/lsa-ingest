@@ -23,6 +23,9 @@ fs.readFile(__dirname + '/data/maponics_sample_us_attendance_zones_wkt.txt', 'ut
 	    			path.push({ latitude: parseFloat(splitCoord[1]), longitude: parseFloat(splitCoord[0])});
 	    		});
 	    		object[keys[index]] = path;
+                object.score = Math.round(Math.random() * 10000)/1000;
+                var splitCoord = latLongs[0].split(" ");
+                object.coordinates = { latitude: parseFloat(splitCoord[1]), longitude: parseFloat(splitCoord[0])};
 				School.create(object);
 	    	}
 	    	else {

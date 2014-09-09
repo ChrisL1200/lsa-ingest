@@ -11,6 +11,11 @@ var SchoolSchema = new Schema({
   ed_level: String,
   color: String,
   relver: String,
+  score: Number,
+  coordinates: {
+    latitude: Number,
+    longitude: Number
+  },
   wkt: [{
   	latitude: Number,
   	longitude: Number
