@@ -26,7 +26,12 @@ fs.readFile(__dirname + '/data/maponics_sample_us_attendance_zones_wkt.txt', 'ut
                 object.score = Math.round(Math.random() * 10000)/1000;
                 var splitCoord = latLongs[0].split(" ");
                 object.coordinates = { latitude: parseFloat(splitCoord[1]), longitude: parseFloat(splitCoord[0])};
-				School.create(object);
+				School.create(object, function (err) {
+                    if(i >= content.length - 2) {
+                        console.log("Finished parsing boundary files");
+                        process.exit();
+                    }
+                });
 	    	}
 	    	else {
 	    		object[keys[index]] = value;	
@@ -39,9 +44,6 @@ fs.readFile(__dirname + '/data/maponics_sample_us_attendance_zones_wkt.txt', 'ut
     	});
     	insertion = true;
     	object = {};
-        if(i === content.length - 1) {
-            console.log("Finished parsing boundary files");
-        }
     })
 } );
 });
