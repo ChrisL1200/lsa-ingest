@@ -8,6 +8,12 @@
 Place all boundary data files into data/boundary/.
 Place all education data files into data/education/.
 
+
+In the main app folder, run npm install to begin.
+```sh
+$ npm install
+```
+
 ## Ingesting Education Data
 
 ```sh
@@ -46,10 +52,9 @@ _(Coming soon)_
 
 ## Contributing
 
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com).
 
 
 ## License
 
-Copyright (c) 2014   
+Copyright (c) 2014
 Licensed under the MIT license.
