@@ -5,7 +5,7 @@ var _ = require('lodash');
 var School = require('./schema');
 
 exports.ingest = function() {
-	var instream = fs.createReadStream('./data/education.csv');
+	var instream = fs.createReadStream('./data/education/universal.csv');
 	var outstream = new stream;
 	var rl = readline.createInterface(instream, outstream);
 	rl.on('line', function(line) {

@@ -9,7 +9,7 @@ exports.ingest = function() {
 	var keys;
 	var inserted = 0;
 	School.remove({}, function(err) { 
-		fs.readFile(__dirname + '/../data/maponics_sample_us_attendance_zones_wkt.txt', 'utf8', function read(err, data) {
+		fs.readFile(__dirname + '/../data/boundary/maponics_sample_us_attendance_zones_wkt.txt', 'utf8', function read(err, data) {
 			if (err) {
             	throw err;
         	}

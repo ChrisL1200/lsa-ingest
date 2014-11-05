@@ -5,28 +5,34 @@
 
 ## Getting Started
 
-Install the module with: `npm install lsa-ingest`
+Place all boundary data files into data/boundary/.
+Place all education data files into data/education/.
 
-```js
-var lsa-ingest = require('lsa-ingest');
-lsa-ingest.awesome(); // "awesome"
-```
-
-Install with cli command
+## Ingesting Education Data
 
 ```sh
-$ npm install -g lsa-ingest
-$ lsa-ingest --help
-$ lsa-ingest --version
+$ node app.js ingest=schools
 ```
 
+## Ingesting Homes Data
 
 ```sh
-# creates a browser.js
-$ grunt browserify
+$ node app.js ingest=homes
 ```
 
+## LSA Score Calculator
 
+```sh
+$ node app.js ingest=scores
+```
+
+## Ingesting to production
+
+```sh
+$ node app.js ingest=schools env=prod
+$ node app.js ingest=homes env=prod
+$ node app.js ingest=scores env=prod
+```
 
 ## Documentation
 
