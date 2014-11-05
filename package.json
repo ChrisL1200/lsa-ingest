@@ -27,7 +27,8 @@
     "lodash": "*",
     "csv-parse": "0.0.6",
     "wellknown": "0.3.0",
-    "xml2js": "0.4.4"
+    "xml2js": "0.4.4",
+    "xml-object-stream": "0.3.0"
   },
   "devDependencies": {
     "grunt-contrib-jshint": "^0.10.0",
