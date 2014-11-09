@@ -43,7 +43,7 @@ exports.ingest = function() {
 									console.log("Finished parsing boundary files");
 									Education.ingest();
 								}
-		                	});
+		          });
 						}
 					});
 				}
