@@ -29,34 +29,50 @@ exports.ingest = function() {
 		});
 
 		var listing = null;
-
+		var records = 0;
+		var ingested = 0;
+		var inserted = 0;
+		var finished = false;
 		saxStream.on("opentag", function (tag) {
 			if (tag.name !== "listing" && !listing) return
 			if(tag.name === "listing") {
+			  ingested++;
 				if(listing) {
  					//Convert to JSON
 			  	parseString(listing, function (err, result) {
+			  		if(err) {
+			  			console.log(err);
+			  			ingested--;
+			  		}
 			  		if(result) {
-							Home.collection.insert(result, function (err) {
+							Home.create(result, function (err) {
 								if(err) {
-									throw err;
+									console.log(err);
+								} 
+								else {
+									inserted++;
 								}
-								console.log("Home record created");
+								console.log("Ingested: " + ingested + " Inserted: " + inserted);
+								if(finished && (inserted === (ingested - 1))) {
+									console.log("Finished home ingest...");
+								}
 			        });
 		       	}
 					});
 			  }
 				listing = '';
 			}
-			listing += '<' + tag.name + '>';
+			listing += '<' + escape(tag.name.replace('commons:','').replace('-','')) + '>';
 		});
 
 		saxStream.on("text", function (text) {
-		  listing += text;
+		  listing += text.replace(/[\n\r]/g, '\\n')
+                    .replace(/&/g,"&amp;")
+                    .replace(/-/g,"&#45;");
 		});
 
 		saxStream.on("closetag", function (tagName) {
-		  listing += '</' + tagName + '>';
+		  listing += '</' + escape(tagName.replace('commons:','').replace('-','')) + '>';
 		});
 
 		var compressedRequest = function(options, outStream) {
@@ -77,6 +93,11 @@ exports.ingest = function() {
 		 
 		  req.on('error', function(err) {
 		    throw err;
+		  });
+
+		  req.on('end', function() {
+		  	finished = true;
+		  	console.log("Finished stream");
 		  })
 		}
 		 
