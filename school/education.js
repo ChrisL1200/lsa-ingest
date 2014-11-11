@@ -20,10 +20,16 @@ exports.ingest = function() {
 			var updated = _.merge(school, mergeSchool);
 			inserted++;
 			if(school) {
+				console.log(updated);
     		updated.save(function (err, updatedSchool) {
+					if(err) {
+						console.log(err);
+					}
+    			console.log("Updated: ");
+    			console.log(updatedSchool);
 					if(finished && (inserted === (ingested - 1))) {
-						console.log("Finished education files...")
-						Education.ingest();
+						console.log("Finished education files...");
+						process.exit();
 					}
     		});
   		}
@@ -44,6 +50,5 @@ exports.ingest = function() {
 
 	rl.on('close', function() {
 		finished = true;
-  		// do something on finish here
 	});
 }

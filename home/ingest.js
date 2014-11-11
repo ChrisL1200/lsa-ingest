@@ -33,6 +33,7 @@ exports.ingest = function() {
 		var ingested = 0;
 		var inserted = 0;
 		var finished = false;
+		var printOne = true;
 		saxStream.on("opentag", function (tag) {
 			if (tag.name !== "listing" && !listing) return
 			if(tag.name === "listing") {
@@ -40,19 +41,22 @@ exports.ingest = function() {
 				if(listing) {
  					//Convert to JSON
 			  	parseString(listing, function (err, result) {
+			  		// if(printOne) {
+			  		// 	printOne = false;
+				  	// 	console.log(JSON.stringify(result,null,2));
+				  	// }
 			  		if(err) {
 			  			console.log(err);
 			  			ingested--;
 			  		}
 			  		if(result) {
-							Home.create(result, function (err) {
+							Home.create(result, function (err, newHome) {
 								if(err) {
 									console.log(err);
 								} 
 								else {
 									inserted++;
 								}
-								console.log("Ingested: " + ingested + " Inserted: " + inserted);
 								if(finished && (inserted === (ingested - 1))) {
 									console.log("Finished home ingest...");
 								}
@@ -71,7 +75,13 @@ exports.ingest = function() {
                     .replace(/-/g,"&#45;");
 		});
 
+		saxStream.on("error", function(err) {
+			console.log(err)
+		})
 		saxStream.on("closetag", function (tagName) {
+		// 	if(tagName.replace('commons:', '') === 'Photos'){
+		// 		printOne = true;
+		// 	}
 		  listing += '</' + escape(tagName.replace('commons:','').replace('-','')) + '>';
 		});
 
