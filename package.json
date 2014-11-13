@@ -30,7 +30,8 @@
     "xml2js": "0.4.4",
     "xml-object-stream": "0.3.0",
     "request": "*",
-    "sax": "*"
+    "sax": "*",
+    "async": "*"
   },
   "devDependencies": {
     "grunt-contrib-jshint": "^0.10.0",

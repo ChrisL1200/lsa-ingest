@@ -29,7 +29,7 @@ else {
 }
 
 if(args.ingest === 'schools') {
-    var School = require('./school/boundary');
+    var School = require('./school/ingest');
     School.ingest();
 }
 if(args.ingest === 'homes') {
