@@ -31,7 +31,9 @@
     "xml-object-stream": "0.3.0",
     "request": "*",
     "sax": "*",
-    "async": "*"
+    "async": "*",
+    "lodash-deep": "*",
+    "point-in-polygon": "*"
   },
   "devDependencies": {
     "grunt-contrib-jshint": "^0.10.0",

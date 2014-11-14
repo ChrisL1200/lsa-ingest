@@ -2,12 +2,15 @@ var fs = require('fs');
 var readline = require('readline');
 var stream = require('stream');
 var _ = require('lodash');
+_.mixin(require("lodash-deep"));
 var School = require('./schema');
 var Ingest = require('./ingest');
-var async = require('async');
 
-exports.ingest = function(filename, nces_schid) {
-	var instream = fs.createReadStream(filename);
+var readObjects = [];
+
+exports.ingest = function(objects) {
+	readObjects = objects;
+	var instream = fs.createReadStream(readObjects[0].filename);
 	var outstream = new stream;
 	var rl = readline.createInterface(instream, outstream);
 	var education = {
@@ -17,15 +20,15 @@ exports.ingest = function(filename, nces_schid) {
 		firstLine: true,
 		keys: []
 	};
-	console.log("Parsing " + filename);
+	console.log("Parsing " + readObjects[0].filename);
 	rl.on('line', function(line) {
 		var columns = line.split(',');
 		if(!education.firstLine) {
 			var mergeSchool = {};
-			_.each(education.keys, function(key, index) {
-				mergeSchool[key] = columns[index];
+			_.each(readObjects[0].model, function(item) {
+				_.deepSet(mergeSchool, item.key, columns[item.index]);
 			});
-			checkIfBlocked(mergeSchool, education.keys[nces_schid], columns, education);
+			rowCallback(mergeSchool, education);
 		}
 		else {
 			education.firstLine = false;
@@ -38,21 +41,19 @@ exports.ingest = function(filename, nces_schid) {
 	});
 }
 
-function checkIfBlocked(mergeSchool, nces_schid, columns, education) {
-	if(Ingest.containsNCES(mergeSchool[nces_schid])) {
-		console.log("Blocked: " + mergeSchool[nces_schid]);
-		setTimeout(checkIfBlocked, 500, mergeSchool, nces_schid, columns, education);
+function checkIfBlocked(mergeSchool, education) {
+	if(Ingest.containsNCES(mergeSchool['nces_schid'])) {
+		console.log("Blocked: " + mergeSchool['nces_schid']);
+		setTimeout(checkIfBlocked, 500, mergeSchool, education);
 	}
 	else {
-		Ingest.addNCES(mergeSchool[nces_schid]);
-		rowCallback(mergeSchool, nces_schid, columns, education);
+		Ingest.addNCES(mergeSchool['nces_schid']);
+		rowCallback(mergeSchool, education);
 	}
 }
 
-function rowCallback(mergeSchool, nces_schid, columns, education) {
+function rowCallback(mergeSchool, education) {
 	education.ingested++;
-	delete mergeSchool[education.keys[nces_schid]];
-	mergeSchool['nces_schid'] = columns[nces_schid];
 	School.findOne({nces_schid: mergeSchool['nces_schid']}, function(err, school){
 		if(err) {
 			console.log(err);
@@ -60,30 +61,31 @@ function rowCallback(mergeSchool, nces_schid, columns, education) {
 		var updated = _.merge(school, mergeSchool);
 		education.inserted++;
 		if(school) {
-			console.log("Updating a school...");
   		updated.save(function (err, updatedSchool) {
-				Ingest.removeNCES(mergeSchool[nces_schid]);
-				if(err) {
-					console.log(err);
-				}
-				if(education.finished && (education.inserted === (education.ingested - 1))) {
-					console.log("education.finished math files...");
-					process.exit();
-				}
+				mongoCallback(updatedSchool, err, education);
   		});
 		}
 		else {
-			console.log("Ingested: " + education.ingested);
-			School.collection.insert(mergeSchool, function (err, newSchool) {
-				Ingest.removeNCES(mergeSchool[nces_schid]);
-				if(err) {
-					console.log(err);
-				}
-				if(education.finished && (education.inserted === (education.ingested - 1))) {
-					console.log("education.finished math files...");
-					process.exit();
-				}
+			School.create(mergeSchool, function (err, newSchool) {
+				mongoCallback(newSchool, err, education);
       });
 		}
 	});
+}
+
+function mongoCallback(school, err, education) {
+	// Ingest.removeNCES(school['nces_schid']);
+	if(err) {
+		console.log(err);
+	}
+	if(education.finished && (education.inserted === (education.ingested - 1))) {
+		console.log("Finished parsing " + readObjects[0].filename);
+		readObjects.splice(0,1);
+		if(readObjects.length > 0) {
+			exports.ingest(readObjects);
+		}
+		else {
+			process.exit();
+		}
+	}
 }
