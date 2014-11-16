@@ -33,7 +33,9 @@
     "sax": "*",
     "async": "*",
     "lodash-deep": "*",
-    "point-in-polygon": "*"
+    "point-in-polygon": "*",
+    "gm": "*",
+    "longjohn": "*"
   },
   "devDependencies": {
     "grunt-contrib-jshint": "^0.10.0",

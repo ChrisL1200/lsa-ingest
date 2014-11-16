@@ -47,13 +47,8 @@ var HomeSchema = new Schema({
                     mediamodificationtimestamp: [ Date ],
                     mediaurl: [ String ],
                     mediacaption: [ String ],
-                    mediadescription: [ String ]
-                },
-                {
-                    mediamodificationtimestamp: [ Date ],
-                    mediaurl: [ String ],
-                    mediacaption: [ String ],
-                    mediadescription: [ String ]
+                    mediadescription: [ String ],
+                    storedId: String
                 }
             ]
         }],
