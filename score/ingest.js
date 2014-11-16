@@ -1,6 +1,7 @@
 var School = require('../school/schema');
 var Home = require('../home/schema');
 var _ = require('lodash');
+var inside = require('point-in-polygon');
 
 exports.ingest = function() {
 	var stream = School.find().stream();
@@ -10,24 +11,42 @@ exports.ingest = function() {
 			.where('listing.location.latitude').gt(_.min(doc.wkt, 'latitude').latitude).lt(_.max(doc.wkt, 'latitude').latitude)
 			.where('listing.location.longitude').gt(_.min(doc.wkt, 'longitude').longitude).lt(_.max(doc.wkt, 'longitude').longitude)
 			.exec(function (err, homes) {
+				var scores = {
+					realEstate: 0,
+					school: 0
+				};
+
 				var score = 0;
-				_.each(homes, function(home) {
-					score += home.price;	
+				var wkt = [];
+				_.each(doc.wkt, function(element) {
+						wkt.push([element.latitude, element.longitude]);
 				});
 
-				if(homes && homes.length > 0) {
-					score = score / homes.length;
-				}
+				var medianHome = [];
+				_.each(homes, function(home) {
+					if(home.listing.location && inside([home.listing.location[0].latitude[0], home.listing.location[0].longitude[0]], wkt)) {
+						medianHome.push(home.listing.listprice[0]);
+          }
+				});
 
-				var scores = {score: score};
-				var updated = _.merge(doc, scores);
-				updated.save(function (err) {
-  			});
+				if(medianHome.length > 0) {
+					medianHome.sort( function(a,b) {return a - b;} );
+    			var half = Math.floor(medianHome.length/2);
+
+    			if(medianHome.length % 2)
+        		scores.realEstate = medianHome[half];
+    			else
+        		scores.realEstate = (medianHome[half-1] + medianHome[half]) / 2.0;
+				}
+				doc = _.merge(doc, {score: scores});
+				doc.save(function (err, updateSchool) {
+					// console.log(updateSchool);
+				});
 
   			_.each(homes, function(home) {
 					var updatedHome = _.merge(home, scores);
 					updatedHome.save(function (err) {
-  					console.log("Added score to home model");
+  					// console.log("Added score to home model");
   				});
   			});
   		});

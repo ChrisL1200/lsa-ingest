@@ -13,6 +13,10 @@ var ScoreSchema = new Schema({
   phone: String,
   color: String,
   relver: String,
+  freeLunch: Number,
+  redLunch: Number,
+  member: Number,
+  title: String,
   coordinates: {
     latitude: Number,
     longitude: Number

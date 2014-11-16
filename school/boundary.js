@@ -2,7 +2,7 @@ var fs = require('fs');
 var _ = require('lodash');
 var parser = require('wellknown');
 var School = require('./schema');
-var Education = require('./education');
+var Ingest = require('./ingest');
 var readline = require('readline');
 var stream = require('stream');
 
@@ -48,7 +48,7 @@ exports.ingest = function() {
 									}
 									if(finished && (inserted === (ingested - 1))) {
 										console.log("Finished boundary files...")
-										Education.ingest();
+										Ingest.ingest();
 									}
 			          });
 							}

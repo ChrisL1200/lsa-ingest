@@ -1,7 +1,9 @@
 var parseString = require('xml2js').parseString;
 var request = require('request');
+var imageRequest = require('request');
 var Home = require('./schema');
 var _ = require('lodash');
+var fs = require('fs');
 var zlib = require('zlib');
 
 exports.ingest = function() {
@@ -34,22 +36,52 @@ exports.ingest = function() {
 		var inserted = 0;
 		var finished = false;
 		var printOne = true;
+		var lastRunDate = new Date(0);
+		var mongoose = require('mongoose'),
+    Schema = mongoose.Schema;
+		var ImageSchema = new Schema({
+			img: {
+				data: Buffer,
+				contentType: String
+			},
+			url: String
+		});
+		var Images = mongoose.model('Images', ImageSchema);
 		saxStream.on("opentag", function (tag) {
 			if (tag.name !== "listing" && !listing) return
 			if(tag.name === "listing") {
 			  ingested++;
 				if(listing) {
- 					//Convert to JSON
 			  	parseString(listing, function (err, result) {
-			  		// if(printOne) {
-			  		// 	printOne = false;
-				  	// 	console.log(JSON.stringify(result,null,2));
-				  	// }
-			  		if(err) {
-			  			console.log(err);
-			  			ingested--;
-			  		}
 			  		if(result) {
+			  			_.each(result.listing.photos, function(photo){
+			  				var id = 'xxx/xxx/4xx/yxxx/xxxx'.replace(/[xy]/g, function(c) {
+								    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+								    return v.toString(16);
+								});
+								var checkDirectory = id.split('/');
+								_.each([[0],[0,1],[0,1,2],[0,1,2,3]], function(dirs) {
+									var directory = 'images/';
+									_.each(dirs, function(dir, index) {
+										directory += checkDirectory[dir];
+										if(index !== (dirs.length - 1)) {
+											directory += '/';
+										}
+									});
+									if (!fs.existsSync(directory)){
+									    fs.mkdirSync(directory);
+									}
+								});
+								photo.photo[0].storedId = id + '.jpeg';
+								request({url: photo.photo[0].mediaurl[0], encoding: null }, 
+									function (error, response, body) {
+									    if (!error && response.statusCode == 200) {
+									        body = new Buffer(body, 'binary');
+									        var wstream = fs.createWriteStream('images/' + photo.photo[0].storedId);
+													wstream.write(body);
+											}
+									})
+			  			});
 							Home.create(result, function (err, newHome) {
 								if(err) {
 									console.log(err);
@@ -79,9 +111,6 @@ exports.ingest = function() {
 			console.log(err)
 		})
 		saxStream.on("closetag", function (tagName) {
-		// 	if(tagName.replace('commons:', '') === 'Photos'){
-		// 		printOne = true;
-		// 	}
 		  listing += '</' + escape(tagName.replace('commons:','').replace('-','')) + '>';
 		});
 
@@ -102,7 +131,7 @@ exports.ingest = function() {
 		  });
 		 
 		  req.on('error', function(err) {
-		    throw err;
+		    console.log(err);
 		  });
 
 		  req.on('end', function() {
