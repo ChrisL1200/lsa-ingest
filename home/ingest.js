@@ -37,24 +37,17 @@ exports.ingest = function() {
 		var finished = false;
 		var printOne = true;
 		var lastRunDate = new Date(0);
-		var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
-		var ImageSchema = new Schema({
-			img: {
-				data: Buffer,
-				contentType: String
-			},
-			url: String
+		var imageRequest = request.defaults({
+		  encoding: null, pool: {maxSockets: Infinity}
 		});
-		var Images = mongoose.model('Images', ImageSchema);
 		saxStream.on("opentag", function (tag) {
 			if (tag.name !== "listing" && !listing) return
 			if(tag.name === "listing") {
 			  ingested++;
 				if(listing) {
 			  	parseString(listing, function (err, result) {
-			  		if(result) {
-			  			_.each(result.listing.photos, function(photo){
+			  		if(result && result.listing.photos) {
+			  			_.each([result.listing.photos[0].photo[0]], function(photo){
 			  				var id = 'xxx/xxx/4xx/yxxx/xxxx'.replace(/[xy]/g, function(c) {
 								    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
 								    return v.toString(16);
@@ -72,13 +65,17 @@ exports.ingest = function() {
 									    fs.mkdirSync(directory);
 									}
 								});
-								photo.photo[0].storedId = id + '.jpeg';
-								request({url: photo.photo[0].mediaurl[0], encoding: null }, 
+								photo.storedId = id + '.jpeg';
+								imageRequest({url: photo.mediaurl[0]}, 
 									function (error, response, body) {
 									    if (!error && response.statusCode == 200) {
 									        body = new Buffer(body, 'binary');
-									        var wstream = fs.createWriteStream('images/' + photo.photo[0].storedId);
+									        var wstream = fs.createWriteStream('images/' + photo.storedId);
+									        console.log('images/' + photo.storedId);
 													wstream.write(body);
+													wstream.on('error', function(err){
+														console.log(err);
+													});
 											}
 									})
 			  			});

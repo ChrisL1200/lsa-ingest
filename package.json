@@ -34,8 +34,8 @@
     "async": "*",
     "lodash-deep": "*",
     "point-in-polygon": "*",
-    "gm": "*",
-    "longjohn": "*"
+    "longjohn": "*",
+    "graceful-fs": "*"
   },
   "devDependencies": {
     "grunt-contrib-jshint": "^0.10.0",
