@@ -1,6 +1,5 @@
 var parseString = require('xml2js').parseString;
 var request = require('request');
-var imageRequest = require('request');
 var Home = require('./schema');
 var _ = require('lodash');
 var fs = require('fs');
@@ -31,54 +30,16 @@ exports.ingest = function() {
 		});
 
 		var listing = null;
-		var records = 0;
 		var ingested = 0;
 		var inserted = 0;
 		var finished = false;
-		var printOne = true;
-		var lastRunDate = new Date(0);
-		var imageRequest = request.defaults({
-		  encoding: null, pool: {maxSockets: Infinity}
-		});
 		saxStream.on("opentag", function (tag) {
 			if (tag.name !== "listing" && !listing) return
 			if(tag.name === "listing") {
 			  ingested++;
 				if(listing) {
 			  	parseString(listing, function (err, result) {
-			  		if(result && result.listing.photos) {
-			  			_.each([result.listing.photos[0].photo[0]], function(photo){
-			  				var id = 'xxx/xxx/4xx/yxxx/xxxx'.replace(/[xy]/g, function(c) {
-								    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-								    return v.toString(16);
-								});
-								var checkDirectory = id.split('/');
-								_.each([[0],[0,1],[0,1,2],[0,1,2,3]], function(dirs) {
-									var directory = 'images/';
-									_.each(dirs, function(dir, index) {
-										directory += checkDirectory[dir];
-										if(index !== (dirs.length - 1)) {
-											directory += '/';
-										}
-									});
-									if (!fs.existsSync(directory)){
-									    fs.mkdirSync(directory);
-									}
-								});
-								photo.storedId = id + '.jpeg';
-								imageRequest({url: photo.mediaurl[0]}, 
-									function (error, response, body) {
-									    if (!error && response.statusCode == 200) {
-									        body = new Buffer(body, 'binary');
-									        var wstream = fs.createWriteStream('images/' + photo.storedId);
-									        console.log('images/' + photo.storedId);
-													wstream.write(body);
-													wstream.on('error', function(err){
-														console.log(err);
-													});
-											}
-									})
-			  			});
+			  		if(result) {
 							Home.create(result, function (err, newHome) {
 								if(err) {
 									console.log(err);

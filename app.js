@@ -8,7 +8,7 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 var mongoose = require('mongoose');
-require('longjohn');
+// require('longjohn');
 
 var args = {};
 // Command line args
@@ -29,15 +29,21 @@ else {
   mongoose.connect('mongodb://localhost/lsa-dev');
 }
 
-
 if(args.ingest === 'schools') {
     var School = require('./school/boundary');
     School.ingest();
 }
+
 if(args.ingest === 'homes') {
     var Home = require('./home/ingest');
     Home.ingest();
 }
+
+if(args.ingest === 'photos') {
+    var Photo = require('./photos/ingest');
+    Photo.ingest();
+}
+
 if(args.ingest === 'scores') {
     var Score = require('./score/ingest');
     Score.ingest();
