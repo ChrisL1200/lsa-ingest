@@ -9,6 +9,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 var mongoose = require('mongoose');
 require('longjohn');
+
 var args = {};
 // Command line args
 process.argv.forEach(function (val, index, array) {
@@ -21,7 +22,7 @@ process.argv.forEach(function (val, index, array) {
 // Connect to database
 if(args.env === 'prod') {
   console.log("Ingesting to Production...");  
-  mongoose.connect('mongodb://heroku:rxH-44oMRwBqmuRPUlzdGk_D56cxJXAZ9jDNesWXvgMYA-YFYiVhnXman46tBYCCehQnOuepdHUmLANc7GH41g@kahana.mongohq.com:10044/app27322759');
+  mongoose.connect('mongodb://localhost/lsa');
 }
 else {
   console.log("Ingesting to Development...");
