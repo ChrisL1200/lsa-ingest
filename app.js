@@ -3,11 +3,15 @@
  */
 
 'use strict';
-
+var School = require('./school/boundary');
+var Home = require('./home/ingest');
+var Photo = require('./photos/ingest');
+var Score = require('./score/ingest');
+var async = require('async');
+var mongoose = require('mongoose');
 // Set default node environment to development
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
-var mongoose = require('mongoose');
 // require('longjohn');
 
 var args = {};
@@ -30,21 +34,20 @@ else {
 }
 
 if(args.ingest === 'schools') {
-    var School = require('./school/boundary');
     School.ingest();
 }
-
-if(args.ingest === 'homes') {
+else if(args.ingest === 'homes') {
     var Home = require('./home/ingest');
     Home.ingest();
 }
-
-if(args.ingest === 'photos') {
-    var Photo = require('./photos/ingest');
+else if(args.ingest === 'photos') {
     Photo.ingest();
 }
-
-if(args.ingest === 'scores') {
-    var Score = require('./score/ingest');
+else if(args.ingest === 'scores') {
     Score.ingest();
+}
+else {
+  async.parallel([School.ingest, Home.ingest], function(err, results) {
+    Score.ingest();
+  });
 }

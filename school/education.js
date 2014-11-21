@@ -8,7 +8,7 @@ var Ingest = require('./ingest');
 
 var readObjects = [];
 
-exports.ingest = function(objects) {
+exports.ingest = function(objects, callback) {
 	readObjects = objects;
 	var instream = fs.createReadStream(readObjects[0].filename);
 	var outstream = new stream;
@@ -85,7 +85,7 @@ function mongoCallback(school, err, education) {
 			exports.ingest(readObjects);
 		}
 		else {
-			process.exit();
+			callback();
 		}
 	}
 }

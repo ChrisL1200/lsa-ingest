@@ -38,6 +38,7 @@ exports.ingest = function() {
     			else
         		scores.realEstate = (medianHome[half-1] + medianHome[half]) / 2.0;
 				}
+				
 				doc = _.merge(doc, {score: scores});
 				doc.save(function (err, updateSchool) {
 					// console.log(updateSchool);
@@ -52,7 +53,7 @@ exports.ingest = function() {
   		});
 		}
 	}).on('error', function (err) {
-	  throw err;
+	  console.log(err);
 	}).on('close', function () {
 		console.log('Finished');
 	});

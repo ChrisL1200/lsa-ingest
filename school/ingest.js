@@ -2,7 +2,7 @@ var Education = require('./education');
 var Boundary = require('./boundary');
 var ncesList = [];
 
-exports.ingest = function() {
+exports.ingest = function(callback) {
   Education.ingest([{
 		filename: './data/education/universal.csv',
 		model: [
@@ -27,7 +27,7 @@ exports.ingest = function() {
 			{index:4, key: 'nces_schid'},
 			{index:7, key: 'allMath'}
 		]
-	}]);
+	}], callback);
 }
 
 exports.addNCES = function(id) {

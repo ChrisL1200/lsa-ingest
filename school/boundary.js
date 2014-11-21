@@ -6,7 +6,7 @@ var Ingest = require('./ingest');
 var readline = require('readline');
 var stream = require('stream');
 
-exports.ingest = function() {
+exports.ingest = function(callback) {
 	console.log("Parsing boundary files....");
 	var keys;
 	var inserted = 0;
@@ -48,7 +48,7 @@ exports.ingest = function() {
 									}
 									if(finished && (inserted === (ingested - 1))) {
 										console.log("Finished boundary files...")
-										Ingest.ingest();
+										Ingest.ingest(callback);
 									}
 			          });
 							}

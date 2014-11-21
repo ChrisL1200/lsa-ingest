@@ -35,7 +35,9 @@
     "lodash-deep": "*",
     "point-in-polygon": "*",
     "longjohn": "*",
-    "graceful-fs": "*"
+    "graceful-fs": "*",
+    "cron": "*",
+    "time": "*"
   },
   "devDependencies": {
     "grunt-contrib-jshint": "^0.10.0",

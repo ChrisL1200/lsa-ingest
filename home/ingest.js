@@ -4,9 +4,14 @@ var Home = require('./schema');
 var _ = require('lodash');
 var fs = require('fs');
 var zlib = require('zlib');
+var lastRunDate = new Date(0);
+var imageRequest = request.defaults({
+  encoding: null, pool: {maxSockets: Infinity}
+});
 
 exports.ingest = function() {
 	//Remove old collection
+	console.log('Ingesting Homes...');
 	Home.remove({}, function(err) { 
 		var options = {
 		  url : "https://feeds.listhub.com/pickup/cruvita/cruvita.xml.gz",
@@ -77,7 +82,6 @@ exports.ingest = function() {
 		 
 		  req.on('response', function (res) {
 		    if (res.statusCode !== 200) throw new Error('Status not 200')
-		 
 		    var encoding = res.headers['content-type'];
 		    if (encoding == 'application/x-gzip') {
 		      res.pipe(zlib.createGunzip()).pipe(outStream)
@@ -94,11 +98,9 @@ exports.ingest = function() {
 
 		  req.on('end', function() {
 		  	finished = true;
-		  	console.log("Finished stream");
 		  })
 		}
 		 
 		compressedRequest(options, saxStream);
 	});
-
 }
