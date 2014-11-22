@@ -17,7 +17,8 @@ var written = 0;
 var total = 0;
 var timedout = false;
 
-exports.ingest = function() {
+exports.ingest = function(callback) {
+	console.log("Beginning photo ingest...");
 	var stream = Home.find().stream();
 	stream.on('data', function (result) {
 		pauseStream(this);

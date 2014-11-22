@@ -1,6 +1,7 @@
 var parseString = require('xml2js').parseString;
 var request = require('request');
 var Home = require('./schema');
+var Photo = require('../photos/ingest');
 var _ = require('lodash');
 var fs = require('fs');
 var zlib = require('zlib');
@@ -10,7 +11,6 @@ var imageRequest = request.defaults({
 });
 
 exports.ingest = function() {
-	//Remove old collection
 	console.log('Ingesting Homes...');
 	Home.remove({}, function(err) { 
 		var options = {
@@ -54,6 +54,7 @@ exports.ingest = function() {
 								}
 								if(finished && (inserted === (ingested - 1))) {
 									console.log("Finished home ingest...");
+									Photo.ingest();
 								}
 			        });
 		       	}
