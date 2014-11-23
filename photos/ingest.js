@@ -72,7 +72,7 @@ exports.ingest = function(callback) {
 function pauseStream(stream) {
 	if((total > (written + 500)) && !timedout) {
 		timedout = true;
-		console.log("FREEZE MUTHA FUCKA");
+		console.log("FREEZE");
 			stream.pause();
 			setTimeout(function() {
 				timedout = false;
