@@ -1,7 +1,6 @@
 var parseString = require('xml2js').parseString;
 var request = require('request');
 var Home = require('./schema');
-var Photo = require('../photos/ingest');
 var _ = require('lodash');
 var fs = require('fs');
 var zlib = require('zlib');
@@ -10,7 +9,7 @@ var imageRequest = request.defaults({
   encoding: null, pool: {maxSockets: Infinity}
 });
 
-exports.ingest = function() {
+exports.ingest = function(callback) {
 	console.log('Ingesting Homes...');
 	Home.remove({}, function(err) { 
 		var options = {
@@ -50,9 +49,10 @@ exports.ingest = function() {
 									console.log(err);
 								} 
 							  inserted++;
+							  console.log("Inserted: " + inserted + " Ingested: " + ingested);
 								if(finished && (inserted === (ingested - 1))) {
 									console.log("Finished home ingest...");
-									Photo.ingest();
+									callback();
 								}
 			        });
 		       	}
@@ -64,9 +64,7 @@ exports.ingest = function() {
 		});
 
 		saxStream.on("text", function (text) {
-		  listing += text.replace(/[\n\r]/g, '\\n')
-                    .replace(/&/g,"&amp;")
-                    .replace(/-/g,"&#45;");
+		  listing += text.replace(/[\n\r]/g, '\\n').replace(/&/g,"&amp;").replace(/-/g,"&#45;");
 		});
 
 		saxStream.on("error", function(err) {

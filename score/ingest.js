@@ -47,7 +47,7 @@ exports.ingest = function() {
 				}
 				
 				/* School Score */
-				var lunch = ((doc.freeLunch === -2 ? 1 : doc.freeLunch) + (doc.redLunch === -2 ? 1 : doc.redLunch)) / (doc.member === -2 ? 1 : doc.member))) * 100;
+				var lunch = (((doc.freeLunch === -2 ? 1 : doc.freeLunch) + (doc.redLunch === -2 ? 1 : doc.redLunch)) / (doc.member === -2 ? 1 : doc.member)) * 100;
 				var stRatio = doc.stRatio === 0 ? 1 : doc.stRatio;
 
 				var titleOne;
@@ -73,7 +73,7 @@ exports.ingest = function() {
 				var solMath = parseTestScore(doc.allMath);
 
 				scores.school = lunch * stRatio * titleOne * solReading * solMath;
-				
+
 				/* Save Scores */
 				doc = _.merge(doc, {score: scores});
 				doc.save(function (err, updateSchool) {

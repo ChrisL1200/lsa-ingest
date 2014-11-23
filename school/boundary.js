@@ -11,7 +11,7 @@ exports.ingest = function(callback) {
 	var keys;
 	var inserted = 0;
 	School.remove({}, function(err) { 
-		var instream = fs.createReadStream(__dirname + '/../data/boundary/maponics_attendancezones_wkt.txt');
+		var instream = fs.createReadStream(__dirname + '/../data/boundary/maponics_sample_us_attendance_zones_wkt.txt');
 		var outstream = new stream;
 		var rl = readline.createInterface(instream, outstream);
 		var firstLine = true;

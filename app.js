@@ -47,6 +47,7 @@ else if(args.ingest === 'scores') {
 }
 else {
   async.parallel([School.ingest, Home.ingest], function(err, results) {
+    Photo.ingest();
     Score.ingest();
   });
 }

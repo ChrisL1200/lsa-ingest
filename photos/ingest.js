@@ -48,15 +48,15 @@ exports.ingest = function(callback) {
 				photo.storedId = id + '.jpeg';
 				imageRequest({url: photo.mediaurl[0]}, 
 					function (error, response, body) {
-							received++;
-					    if (!error && response.statusCode == 200) {
-					        body = new Buffer(body, 'binary');
-					        fs.writeFile('images/' + id + '.jpeg', body, function (err) {
-					        	written++;
-									  if (err) throw err;
-										console.log("received: " + received + " written: " + written + " total: " + total);
-									});
-							}
+						received++;
+				    if (!error && response.statusCode == 200) {
+			        body = new Buffer(body, 'binary');
+			        fs.writeFile('images/' + id + '.jpeg', body, function (err) {
+			        	written++;
+							  if (err) throw err;
+								console.log("received: " + received + " written: " + written + " total: " + total);
+							});
+						}
 				});
 			});
 			result.save();
@@ -69,14 +69,14 @@ exports.ingest = function(callback) {
 }
 
 function pauseStream(stream) {
-	if((total > (written + 500)) && !timedout) {
+	if((total > (written + 1000)) && !timedout) {
 		timedout = true;
 		console.log("FREEZE");
-			stream.pause();
-			setTimeout(function() {
-				timedout = false;
+		stream.pause();
+		setTimeout(function() {
+			timedout = false;
 	    pauseStream(stream);
-	  }, 5000);
+	  }, 300);
 	}
 	else {
 		stream.resume();
