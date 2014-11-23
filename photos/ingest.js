@@ -19,6 +19,9 @@ var timedout = false;
 
 exports.ingest = function(callback) {
 	console.log("Beginning photo ingest...");
+	if (!fs.existsSync('images')){
+	    fs.mkdirSync('images');
+	}
 	var stream = Home.find().stream();
 	stream.on('data', function (result) {
 		pauseStream(this);

@@ -5,6 +5,10 @@ var mongoose = require('mongoose'),
 
 var HomeSchema = new Schema({
     listing: {
+        score: {
+          realEstate: Number,
+          school: Number
+        },
         address: [{
             preferenceorder: [ Number ],
             addresspreferenceorder: [ Number ],
