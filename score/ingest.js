@@ -23,7 +23,7 @@ exports.ingest = function() {
 					school: 0
 				};
 
-				var score = 0;
+				/* Real Estate Score */
 				var wkt = [];
 				_.each(doc.wkt, function(element) {
 						wkt.push([element.latitude, element.longitude]);
@@ -46,6 +46,35 @@ exports.ingest = function() {
         		scores.realEstate = (medianHome[half-1] + medianHome[half]) / 2.0;
 				}
 				
+				/* School Score */
+				var lunch = ((doc.freeLunch === -2 ? 1 : doc.freeLunch) + (doc.redLunch === -2 ? 1 : doc.redLunch)) / (doc.member === -2 ? 1 : doc.member))) * 100;
+				var stRatio = doc.stRatio === 0 ? 1 : doc.stRatio;
+
+				var titleOne;
+				switch(doc.titleOne) {
+					case "N":
+						titleOne = 1;
+						break;
+					case "M":
+						titleOne = 1;
+						break;
+					case "1":
+						titleOne = 100;
+						break;
+					case "2":
+						titleOne = 25;
+						break;
+					default:
+						titleOne = parseInt(doc.titleOne);
+						break;
+				}
+
+				var solReading = parseTestScore(doc.allReading);
+				var solMath = parseTestScore(doc.allMath);
+
+				scores.school = lunch * stRatio * titleOne * solReading * solMath;
+				
+				/* Save Scores */
 				doc = _.merge(doc, {score: scores});
 				doc.save(function (err, updateSchool) {
 					console.log(" written: " + written + " total: " + total);
@@ -89,4 +118,17 @@ function pauseStream(stream) {
 	else {
 		stream.resume();
 	}
+}
+
+function parseTestScore(test) {
+	var testScore = parseInt(test);
+	if(isNan(solReading)) {
+		if(test !== "NULL") {
+			testScore = parseInt(test.replace(/\D/g,''));
+		}
+		else {
+			testScore = 1;
+		}	
+	}
+	return testScore;
 }

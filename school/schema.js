@@ -11,6 +11,11 @@ var SchoolSchema = new Schema({
   ed_level: String,
   phone: String,
   color: String,
+  freeLunch: Number,
+  redLunch: Number,
+  member: Number,
+  titleOne: String,
+  stRatio: Number,
   score: {
     realEstate: Number,
     school: Number

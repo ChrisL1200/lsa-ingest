@@ -37,7 +37,6 @@ if(args.ingest === 'schools') {
     School.ingest();
 }
 else if(args.ingest === 'homes') {
-    var Home = require('./home/ingest');
     Home.ingest();
 }
 else if(args.ingest === 'photos') {

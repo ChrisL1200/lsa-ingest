@@ -1,7 +1,6 @@
 var _ = require('lodash');
 var Home = require('../home/schema');
 var request = require('request');
-// request.debug = true;
 var async = require('async');
 var fs = require('graceful-fs');
 var urls = [];

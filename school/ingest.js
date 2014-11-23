@@ -11,7 +11,8 @@ exports.ingest = function(callback) {
 			{index:23, key:'coordinates.longitude'},
 			{index:37, key:'freeLunch'},
 			{index:38, key:'redLunch'},
-			{index:289, key:'member'},
+			{index:289, key:'stRatio'},
+			{index:266, key:'member'},
 			{index:31, key:'title'}
 		]
 	},
