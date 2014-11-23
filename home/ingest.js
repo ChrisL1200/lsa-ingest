@@ -41,10 +41,10 @@ exports.ingest = function() {
 		saxStream.on("opentag", function (tag) {
 			if (tag.name !== "listing" && !listing) return
 			if(tag.name === "listing") {
-			  ingested++;
 				if(listing) {
 			  	parseString(listing, function (err, result) {
 			  		if(result) {
+			  			ingested++;
 							Home.create(result, function (err, newHome) {
 								if(err) {
 									console.log(err);
