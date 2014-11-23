@@ -49,9 +49,7 @@ exports.ingest = function() {
 								if(err) {
 									console.log(err);
 								} 
-								else {
-									inserted++;
-								}
+							  inserted++;
 								if(finished && (inserted === (ingested - 1))) {
 									console.log("Finished home ingest...");
 									Photo.ingest();
