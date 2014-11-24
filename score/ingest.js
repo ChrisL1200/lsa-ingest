@@ -106,14 +106,14 @@ exports.ingest = function() {
 }
 
 function pauseStream(stream) {
-	if((total > (written + 500)) && !timedout) {
+	if((total > (written + 2000)) && !timedout) {
 		console.log("FREEZE");
 		timedout = true;
 			stream.pause();
 			setTimeout(function() {
 				timedout = false;
 	    pauseStream(stream);
-	  }, 500);
+	  }, 100);
 	}
 	else {
 		stream.resume();

@@ -25,6 +25,7 @@ exports.ingest = function(callback) {
 	stream.on('data', function (result) {
 		pauseStream(this);
 		if(result && result.listing.photos[0]) {
+			result.photosReceived = 0;
 			_.each(result.listing.photos[0].photo, function(photo){
 				var id = 'xxx/xxx/4xx/yxxx/xxxx'.replace(/[xy]/g, function(c) {
 			    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
@@ -48,6 +49,7 @@ exports.ingest = function(callback) {
 				photo.storedId = id + '.jpeg';
 				imageRequest({url: photo.mediaurl[0]}, 
 					function (error, response, body) {
+						result.photosReceived++;
 						received++;
 				    if (!error && response.statusCode == 200) {
 			        body = new Buffer(body, 'binary');
@@ -55,11 +57,13 @@ exports.ingest = function(callback) {
 			        	written++;
 							  if (err) throw err;
 								console.log("received: " + received + " written: " + written + " total: " + total);
+								if(result.photosReceived === result.listing.photos[0].photo.length) {
+									result.save();
+								}
 							});
 						}
 				});
 			});
-			result.save();
 		}
 	}).on('error', function (err) {
 	  console.log(err);
@@ -71,7 +75,6 @@ exports.ingest = function(callback) {
 function pauseStream(stream) {
 	if((total > (written + 1000)) && !timedout) {
 		timedout = true;
-		console.log("FREEZE");
 		stream.pause();
 		setTimeout(function() {
 			timedout = false;
