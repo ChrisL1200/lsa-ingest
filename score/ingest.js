@@ -113,7 +113,7 @@ function pauseStream(stream) {
 			setTimeout(function() {
 				timedout = false;
 	    pauseStream(stream);
-	  }, 5000);
+	  }, 500);
 	}
 	else {
 		stream.resume();
@@ -122,8 +122,8 @@ function pauseStream(stream) {
 
 function parseTestScore(test) {
 	var testScore = parseInt(test);
-	if(isNan(solReading)) {
-		if(test !== "NULL") {
+	if(isNaN(testScore)) {
+		if(test && test !== "NULL") {
 			testScore = parseInt(test.replace(/\D/g,''));
 		}
 		else {

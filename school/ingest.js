@@ -7,13 +7,14 @@ exports.ingest = function(callback) {
 		filename: './data/education/universal.csv',
 		model: [
 			{index:0, key: 'nces_schid'},
+			{index:7, key: 'sch_name'},
 			{index:22, key:'coordinates.latitude'},
 			{index:23, key:'coordinates.longitude'},
 			{index:37, key:'freeLunch'},
 			{index:38, key:'redLunch'},
 			{index:289, key:'stRatio'},
 			{index:266, key:'member'},
-			{index:31, key:'title'}
+			{index:31, key:'titleOne'}
 		]
 	},
 	{
