@@ -88,7 +88,7 @@ exports.ingest = function() {
 
   			_.each(homes, function(home) {
   				total++;
-					home.scores = scores;
+					home.score = scores;
 					home.save(function (err) {
 					console.log(" written: " + written + " total: " + total);
 						written++;
