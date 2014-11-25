@@ -75,7 +75,7 @@ exports.ingest = function() {
 				scores.school = lunch * stRatio * titleOne * solReading * solMath;
 
 				/* Save Scores */
-				doc = _.merge(doc, {score: scores});
+				doc.scores = scores;
 				doc.save(function (err, updateSchool) {
 					console.log(" written: " + written + " total: " + total);
 					written++;
@@ -86,8 +86,8 @@ exports.ingest = function() {
 
   			_.each(homes, function(home) {
   				total++;
-					var updatedHome = _.merge(home, scores);
-					updatedHome.save(function (err) {
+					home.scores = scores;
+					home.save(function (err) {
 					console.log(" written: " + written + " total: " + total);
 						written++;
 						if((written > (total -1)) && finished){
