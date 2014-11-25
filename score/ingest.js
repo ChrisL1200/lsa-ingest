@@ -75,8 +75,10 @@ exports.ingest = function() {
 				scores.school = lunch * stRatio * titleOne * solReading * solMath;
 
 				/* Save Scores */
-				doc.scores = scores;
+				doc.score = scores;
+				console.log(doc);
 				doc.save(function (err, updateSchool) {
+					console.log(updateSchool);
 					console.log(" written: " + written + " total: " + total);
 					written++;
 					if((written > (total -1)) && finished){
