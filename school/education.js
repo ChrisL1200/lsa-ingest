@@ -7,6 +7,7 @@ var School = require('./schema');
 var Ingest = require('./ingest');
 
 var readObjects = [];
+var timedout = false;
 
 exports.ingest = function(objects, callback) {
 	readObjects = objects;
@@ -22,8 +23,11 @@ exports.ingest = function(objects, callback) {
 	};
 	console.log("Parsing " + readObjects[0].filename);
 	rl.on('line', function(line) {
+		pauseStream(this, education);
 		var columns = line.split(',');
 		if(!education.firstLine) {
+			education.ingested++;
+			console.log("A Ingested: " + education.ingested + " Inserted: " + education.inserted);
 			var mergeSchool = {};
 			_.each(readObjects[0].model, function(item) {
 				_.deepSet(mergeSchool, item.key, columns[item.index]);
@@ -53,15 +57,13 @@ function checkIfBlocked(mergeSchool, education) {
 }
 
 function rowCallback(mergeSchool, education) {
-	education.ingested++;
 	School.findOne({nces_schid: mergeSchool['nces_schid']}, function(err, school){
 		if(err) {
 			console.log(err);
 		}
-		var updated = _.merge(school, mergeSchool);
-		education.inserted++;
+		var school = _.merge(school, mergeSchool);
 		if(school) {
-  		updated.save(function (err, updatedSchool) {
+  		school.save(function (err, updatedSchool) {
 				mongoCallback(updatedSchool, err, education);
   		});
 		}
@@ -75,6 +77,8 @@ function rowCallback(mergeSchool, education) {
 
 function mongoCallback(school, err, education) {
 	// Ingest.removeNCES(school['nces_schid']);
+	education.inserted++;
+	console.log("B Ingested: " + education.ingested + " Inserted: " + education.inserted);
 	if(err) {
 		console.log(err);
 	}
@@ -87,5 +91,19 @@ function mongoCallback(school, err, education) {
 		else {
 			callback();
 		}
+	}
+}
+
+function pauseStream(stream, education) {
+	if((education.ingested > (education.inserted + 10000)) && !timedout) {
+		timedout = true;
+			stream.pause();
+			setTimeout(function() {
+				timedout = false;
+	    pauseStream(stream, education);
+	  }, 100);
+	}
+	else {
+		stream.resume();
 	}
 }

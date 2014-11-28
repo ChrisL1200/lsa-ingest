@@ -63,7 +63,7 @@ exports.ingest = function(callback) {
 		});
 
 		rl.on('close', function() {
-			console.log("Finished ingest");
+			console.log("Finished stream");
 			finished = true;
 		});
 	});

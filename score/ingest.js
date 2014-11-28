@@ -17,6 +17,7 @@ exports.ingest = function() {
 			Home.find()
 			.where('listing.location.latitude').gt(_.min(doc.wkt, 'latitude').latitude).lt(_.max(doc.wkt, 'latitude').latitude)
 			.where('listing.location.longitude').gt(_.min(doc.wkt, 'longitude').longitude).lt(_.max(doc.wkt, 'longitude').longitude)
+			.select('home.listing.location.latitude home.listing.location.longitude home.listing.listprice')
 			.exec(function (err, homes) {
 				var scores = {
 					realEstate: 0,
@@ -47,7 +48,7 @@ exports.ingest = function() {
 				}
 				
 				/* School Score */
-				var lunch = (((doc.freeLunch === -2 ? 1 : doc.freeLunch) + (doc.redLunch === -2 ? 1 : doc.redLunch)) / (doc.member === -2 ? 1 : doc.member)) * 100;
+				var lunch = (((doc.freeLunch === -2  ? 1 : doc.freeLunch) + (doc.redLunch === -2 ? 1 : doc.redLunch)) / (doc.member === -2 ? 1 : doc.member)) * 100;
 				var stRatio = doc.stRatio === 0 ? 1 : doc.stRatio;
 
 				var titleOne;
@@ -71,14 +72,19 @@ exports.ingest = function() {
 
 				var solReading = parseTestScore(doc.allReading);
 				var solMath = parseTestScore(doc.allMath);
-
+				lunch = isNaN(lunch) ? 1 : lunch;
+				titleOne = isNaN(titleOne) ? 1 : titleOne;
+				stRatio = isNaN(stRatio) ? 1 : stRatio;
+				solReading = isNaN(solReading) ? 1 : solReading;
+				solMath = isNaN(solMath) ? 1 : solMath;
 				scores.school = lunch * stRatio * titleOne * solReading * solMath;
-
+				scores.school = isNaN(scores.school) ? 0 : scores.school;
 				/* Save Scores */
 				doc.score = scores;
-				console.log(doc);
 				doc.save(function (err, updateSchool) {
-					console.log(updateSchool);
+					if(err){
+						console.log(err);
+					}
 					console.log(" written: " + written + " total: " + total);
 					written++;
 					if((written > (total -1)) && finished){
@@ -108,8 +114,7 @@ exports.ingest = function() {
 }
 
 function pauseStream(stream) {
-	if((total > (written + 2000)) && !timedout) {
-		console.log("FREEZE");
+	if((total > (written + 10000)) && !timedout) {
 		timedout = true;
 			stream.pause();
 			setTimeout(function() {
