@@ -56,7 +56,7 @@ function checkIfBlocked(mergeSchool, education) {
 	}
 }
 
-function rowCallback(mergeSchool, education) {
+function rowCallback(mergeSchool, education, callback) {
 	School.findOneAndUpdate({nces_schid: mergeSchool['nces_schid']},mergeSchool,{upsert:true})
     .exec(function(err, school){
         if(err) {
