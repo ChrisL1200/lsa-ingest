@@ -23,7 +23,7 @@ exports.ingest = function(objects, callback) {
 	};
 	console.log("Parsing " + readObjects[0].filename);
 	rl.on('line', function(line) {
-		pauseStream(this, education);
+		// pauseStream(this, education);
 		var columns = line.split(',');
 		if(!education.firstLine) {
 			education.ingested++;
@@ -32,7 +32,7 @@ exports.ingest = function(objects, callback) {
 			_.each(readObjects[0].model, function(item) {
 				_.deepSet(mergeSchool, item.key, columns[item.index]);
 			});
-			rowCallback(mergeSchool, education);
+			rowCallback(mergeSchool, education, callback);
 		}
 		else {
 			education.firstLine = false;
@@ -57,25 +57,37 @@ function checkIfBlocked(mergeSchool, education) {
 }
 
 function rowCallback(mergeSchool, education) {
-	School.findOne({nces_schid: mergeSchool['nces_schid']}, function(err, school){
-		if(err) {
-			console.log(err);
-		}
-		var school = _.merge(school, mergeSchool);
-		if(school) {
-  		school.save(function (err, updatedSchool) {
-				mongoCallback(updatedSchool, err, education);
-  		});
-		}
-		else {
-			School.create(mergeSchool, function (err, newSchool) {
-				mongoCallback(newSchool, err, education);
-      });
-		}
-	});
+	School.findOneAndUpdate({nces_schid: mergeSchool['nces_schid']},mergeSchool,{upsert:true})
+    .exec(function(err, school){
+        if(err) {
+            console.log(err);
+        }
+				mongoCallback(school, err, education, callback);
+    });
+	// School.findOne({nces_schid: mergeSchool['nces_schid']})
+	// .lean()
+	// .exec(function(err, school){
+	// 	if(err) {
+	// 		console.log(err);
+	// 	}
+	// 	if(school) {
+	// 		delete mergeSchool['nces_schid'];
+	// 		School.update({nces_schid: school['nces_schid']}, {$set: mergeSchool}, {multi: true})
+	// 		.lean()
+	// 		.exec(function (err, updatedSchool) {
+	// 			console.log(err);
+	// 			mongoCallback(updatedSchool, err, education);
+ //  		});
+	// 	}
+	// 	else {
+	// 		School.create(mergeSchool, function (err, newSchool) {
+	// 			mongoCallback(newSchool, err, education);
+ //      });
+	// 	}
+	// });
 }
 
-function mongoCallback(school, err, education) {
+function mongoCallback(school, err, education, callback) {
 	// Ingest.removeNCES(school['nces_schid']);
 	education.inserted++;
 	console.log("B Ingested: " + education.ingested + " Inserted: " + education.inserted);
