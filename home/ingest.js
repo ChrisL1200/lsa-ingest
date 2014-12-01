@@ -49,7 +49,7 @@ exports.ingest = function(callback) {
 									console.log(err);
 								} 
 							  inserted++;
-							  console.log("Inserted: " + inserted + " Ingested: " + ingested);
+							  // console.log("Inserted: " + inserted + " Ingested: " + ingested);
 								if(finished && (inserted === (ingested - 1))) {
 									console.log("Finished home ingest...");
 									callback();

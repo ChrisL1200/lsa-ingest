@@ -57,34 +57,34 @@ function checkIfBlocked(mergeSchool, education) {
 }
 
 function rowCallback(mergeSchool, education, callback) {
-	School.findOneAndUpdate({nces_schid: mergeSchool['nces_schid']},mergeSchool,{upsert:true})
-    .exec(function(err, school){
-        if(err) {
-            console.log(err);
-        }
-				mongoCallback(school, err, education, callback);
-    });
-	// School.findOne({nces_schid: mergeSchool['nces_schid']})
-	// .lean()
-	// .exec(function(err, school){
-	// 	if(err) {
-	// 		console.log(err);
-	// 	}
-	// 	if(school) {
-	// 		delete mergeSchool['nces_schid'];
-	// 		School.update({nces_schid: school['nces_schid']}, {$set: mergeSchool}, {multi: true})
-	// 		.lean()
-	// 		.exec(function (err, updatedSchool) {
-	// 			console.log(err);
-	// 			mongoCallback(updatedSchool, err, education);
- //  		});
-	// 	}
-	// 	else {
-	// 		School.create(mergeSchool, function (err, newSchool) {
-	// 			mongoCallback(newSchool, err, education);
- //      });
-	// 	}
-	// });
+	// School.findOneAndUpdate({nces_schid: mergeSchool['nces_schid']},mergeSchool,{upsert:true})
+ //    .exec(function(err, school){
+ //        if(err) {
+ //            console.log(err);
+ //        }
+	// 			mongoCallback(school, err, education, callback);
+ //    });
+	School.findOne({nces_schid: mergeSchool['nces_schid']})
+	.lean()
+	.exec(function(err, school){
+		if(err) {
+			console.log(err);
+		}
+		if(school) {
+			delete mergeSchool['nces_schid'];
+			School.update({nces_schid: school['nces_schid']}, {$set: mergeSchool}, {multi: true})
+			.lean()
+			.exec(function (err, updatedSchool) {
+				console.log(err);
+				mongoCallback(updatedSchool, err, education);
+  		});
+		}
+		else {
+			School.create(mergeSchool, function (err, newSchool) {
+				mongoCallback(newSchool, err, education);
+      });
+		}
+	});
 }
 
 function mongoCallback(school, err, education, callback) {
