@@ -1,0 +1,340 @@
+{
+  "_id" : ObjectId("546237f78da3b07f3a2689c4"),
+  "listing" : {
+    "disclaimer" : [
+      "Copyright © 2014 Metropolitan Regional Information Systems, Inc. All rights reserved. All information provided by the listing agent/broker is deemed reliable but is not guaranteed and should be independently verified."
+    ],
+    "modificationtimestamp" : [
+      ISODate("2014-11-10T15:20:10Z")
+    ],
+    "detailedcharacteristics" : [
+      {
+        "_id" : ObjectId("546237f78da3b07f3a2689c5"),
+        "rooftypes" : [
+          {
+            "_id" : ObjectId("546237f78da3b07f3a2689c6"),
+            "rooftype" : [
+              "Unknown"
+            ]
+          }
+        ],
+        "isnewconstruction" : [
+          false
+        ],
+        "architecturestyle" : [
+          "Other"
+        ]
+      }
+    ],
+    "taxes" : [ ],
+    "location" : [
+      {
+        "_id" : ObjectId("546237f78da3b07f3a2689c7"),
+        "zoning" : [ ],
+        "community" : [
+          {
+            "_id" : ObjectId("546237f78da3b07f3a2689c8"),
+            "schools" : [
+              {
+                "_id" : ObjectId("546237f78da3b07f3a2689c9"),
+                "school" : [
+                  {
+                    "_id" : ObjectId("546237f78da3b07f3a2689cd"),
+                    "district" : [
+                      ""
+                    ],
+                    "schoolcategory" : [
+                      "Elementary"
+                    ]
+                  },
+                  {
+                    "_id" : ObjectId("546237f78da3b07f3a2689cc"),
+                    "district" : [
+                      ""
+                    ],
+                    "schoolcategory" : [
+                      "High"
+                    ]
+                  },
+                  {
+                    "_id" : ObjectId("546237f78da3b07f3a2689cb"),
+                    "district" : [
+                      ""
+                    ],
+                    "schoolcategory" : [
+                      "JuniorHigh"
+                    ]
+                  },
+                  {
+                    "_id" : ObjectId("546237f78da3b07f3a2689ca"),
+                    "district" : [
+                      ""
+                    ],
+                    "schoolcategory" : [
+                      "Middle"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "subdivision" : [
+              "QUINCE VIEW MEADOWS"
+            ]
+          }
+        ],
+        "parcelid" : [
+          "431"
+        ],
+        "county" : [
+          "CALVERT"
+        ],
+        "directions" : [
+          "Route 4 to 260 towards Chesapeake / North Beach right on Woodland Way"
+        ],
+        "longitude" : [
+          -76.59126
+        ],
+        "latitude" : [
+          38.70713
+        ]
+      }
+    ],
+    "brokerage" : [
+      {
+        "_id" : ObjectId("546237f78da3b07f3a2689ce"),
+        "email" : [
+          "barbarabaumler@remax.net"
+        ],
+        "phone" : [
+          "(301) 643-0279"
+        ],
+        "name" : [
+          "RE/MAX 100"
+        ]
+      }
+    ],
+    "offices" : [
+      {
+        "_id" : ObjectId("546237f78da3b07f3a2689cf"),
+        "office" : [
+          {
+            "_id" : ObjectId("546237f78da3b07f3a2689d0"),
+            "officeemail" : [
+              "barbarabaumler@remax.net"
+            ],
+            "address" : [
+              {
+                "_id" : ObjectId("546237f78da3b07f3a2689d1"),
+                "country" : [
+                  "US"
+                ],
+                "postalcode" : [
+                  20754
+                ],
+                "stateorprovince" : [
+                  "MD"
+                ],
+                "city" : [
+                  "DUNKIRK"
+                ],
+                "fullstreetaddress" : [
+                  "10425 SOUTHERN MARYLAND BLVD"
+                ],
+                "addresspreferenceorder" : [ ],
+                "preferenceorder" : [
+                  1
+                ]
+              }
+            ],
+            "phonenumber" : [
+              "3018558600"
+            ],
+            "mainofficeid" : [
+              "RMAX1001"
+            ],
+            "brokerid" : [
+              "RMAX1001"
+            ],
+            "corporatename" : [
+              "RE/MAX 100"
+            ],
+            "name" : [
+              "RE/MAX 100"
+            ],
+            "officecode" : [
+              {
+                "_id" : ObjectId("546237f78da3b07f3a2689d2"),
+                "officecodeid" : [
+                  "RMAX1001"
+                ]
+              }
+            ],
+            "officeid" : [
+              "RMAX1001"
+            ],
+            "officekey" : [
+              "3yd-MRIS-RMAX1001"
+            ]
+          }
+        ]
+      }
+    ],
+    "listingparticipants" : [
+      {
+        "_id" : ObjectId("546237f78da3b07f3a2689d3"),
+        "participant" : [
+          {
+            "_id" : ObjectId("546237f78da3b07f3a2689d4"),
+            "websiteurl" : [
+              "http://www.patteemac.com"
+            ],
+            "email" : [
+              "pattee@patteemac.com"
+            ],
+            "officephone" : [
+              "3018558600"
+            ],
+            "primarycontactphone" : [
+              "8887728833"
+            ],
+            "role" : [
+              "Listing"
+            ],
+            "lastname" : [
+              "McInerney"
+            ],
+            "firstname" : [
+              "Pattee"
+            ],
+            "participantid" : [
+              41080
+            ],
+            "participantkey" : [
+              "3yd-MRIS-41080"
+            ]
+          }
+        ]
+      }
+    ],
+    "partialbathrooms" : [
+      1
+    ],
+    "onequarterbathrooms" : [
+      0
+    ],
+    "halfbathrooms" : [
+      1
+    ],
+    "threequarterbathrooms" : [
+      0
+    ],
+    "fullbathrooms" : [
+      3
+    ],
+    "listingtitle" : [
+      "Detached, Farm House - OWINGS, MD"
+    ],
+    "listingdate" : [
+      ISODate("2014-10-21T00:00:00Z")
+    ],
+    "lotsize" : [
+      1
+    ],
+    "mlsnumber" : [
+      "CA8485975"
+    ],
+    "mlsname" : [
+      "Metropolitan Regional Information Systems, Inc."
+    ],
+    "mlsid" : [
+      "MRIS"
+    ],
+    "listingdescription" : [
+      "Spacious home on generous lot w/ oversized 3 car  detached garage & pool."
+    ],
+    "discloseaddress" : [
+      true
+    ],
+    "marketinginformation" : [
+      {
+        "_id" : ObjectId("546237f78da3b07f3a2689d5"),
+        "vowconsumercomment" : [
+          true
+        ],
+        "vowautomatedvaluationdisplay" : [
+          true
+        ],
+        "vowaddressdisplay" : [
+          true
+        ],
+        "permitaddressoninternet" : [
+          true
+        ]
+      }
+    ],
+    "listingstatus" : [
+      "Active"
+    ],
+    "listingcategory" : [
+      "Purchase"
+    ],
+    "listingkey" : [
+      "3yd-MRIS-CA8485975"
+    ],
+    "propertysubtype" : [
+      "Single Family Detached"
+    ],
+    "propertytype" : [
+      "Residential"
+    ],
+    "bathrooms" : [
+      4
+    ],
+    "bedrooms" : [
+      5
+    ],
+    "leadroutingemail" : [
+      "pattee@patteemac.com"
+    ],
+    "providercategory" : [
+      "Broker"
+    ],
+    "providerurl" : [
+      "http://www.wesellmore.com"
+    ],
+    "providername" : [
+      "RE/MAX 100"
+    ],
+    "listingurl" : [
+      "http://listings.listhub.net/pages/MRIS/CA8485975/?channel=cruvita"
+    ],
+    "listprice" : [
+      499900
+    ],
+    "address" : [
+      {
+        "_id" : ObjectId("546237f78da3b07f3a2689d6"),
+        "country" : [
+          "US"
+        ],
+        "postalcode" : [
+          20736
+        ],
+        "stateorprovince" : [
+          "MD"
+        ],
+        "city" : [
+          "OWINGS"
+        ],
+        "fullstreetaddress" : [
+          "845 WOODLAND WAY"
+        ],
+        "addresspreferenceorder" : [ ],
+        "preferenceorder" : [
+          1
+        ]
+      }
+    ]
+  },
+  "__v" : 0
+}
