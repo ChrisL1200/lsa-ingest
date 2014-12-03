@@ -7,6 +7,7 @@ var School = require('./school/boundary');
 var Home = require('./home/ingest');
 var Photo = require('./photos/ingest');
 var Score = require('./score/ingest');
+var CSV = require('./csv/concat');
 var async = require('async');
 var mongoose = require('mongoose');
 // Set default node environment to development
@@ -44,6 +45,9 @@ else if(args.ingest === 'photos') {
 }
 else if(args.ingest === 'scores') {
     Score.ingest();
+}
+else if(args.ingest === 'csv') {
+    CSV.ingest();
 }
 else {
   async.parallel([School.ingest, Home.ingest], function(err, results) {
