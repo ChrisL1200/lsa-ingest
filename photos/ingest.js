@@ -23,47 +23,58 @@ exports.ingest = function(callback) {
 	}
 	var stream = Home.find().stream();
 	stream.on('data', function (result) {
+		homes++;
 		pauseStream(this);
 		if(result && result.listing.photos[0]) {
 			result.photosReceived = 0;
 			_.each(result.listing.photos[0].photo, function(photo){
-				var id = 'xxx/xxx/4xx/yxxx/xxxx'.replace(/[xy]/g, function(c) {
-			    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-			    return v.toString(16);
-				});
+				if(photo.mediaurl[0]) {
+					var id = 'xxx/xxx/4xx/yxxx/xxxx'.replace(/[xy]/g, function(c) {
+				    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+				    return v.toString(16);
+					});
 
-				var checkDirectory = id.split('/');
-				_.each([[0],[0,1],[0,1,2],[0,1,2,3]], function(dirs) {
-					var directory = 'images/';
-					_.each(dirs, function(dir, index) {
-						directory += checkDirectory[dir];
-						if(index !== (dirs.length - 1)) {
-							directory += '/';
+					var checkDirectory = id.split('/');
+					_.each([[0],[0,1],[0,1,2],[0,1,2,3]], function(dirs) {
+						var directory = 'images/';
+						_.each(dirs, function(dir, index) {
+							directory += checkDirectory[dir];
+							if(index !== (dirs.length - 1)) {
+								directory += '/';
+							}
+						});
+						if (!fs.existsSync(directory)){
+						    fs.mkdirSync(directory);
 						}
 					});
-					if (!fs.existsSync(directory)){
-					    fs.mkdirSync(directory);
-					}
-				});
-				total++;
-				photo.storedId = id + '.jpeg';
-				imageRequest({url: photo.mediaurl[0]}, 
-					function (error, response, body) {
-						result.photosReceived++;
-						received++;
-				    if (!error && response.statusCode == 200) {
-			        body = new Buffer(body, 'binary');
-			        fs.writeFile('images/' + id + '.jpeg', body, function (err) {
-			        	written++;
-							  if (err) throw err;
-								console.log("received: " + received + " written: " + written + " total: " + total);
-								if(result.photosReceived === result.listing.photos[0].photo.length) {
-									result.save();
-								}
-							});
-						}
-				});
-			});
+					total++;
+					photo.storedId = id + '.jpeg';
+					imageRequest({url: photo.mediaurl[0]}, 
+						function (error, response, body) {
+							result.photosReceived++;
+							received++;
+					    if (!error && response.statusCode == 200) {
+				        body = new Buffer(body, 'binary');
+				        fs.writeFile('images/' + id + '.jpeg', body, function (err) {
+				        	written++;
+								  if (err) throw err;
+									console.log("received: " + received + " written: " + written + " total: " + total + " homes: " + homes);
+									if(result.photosReceived === result.listing.photos[0].photo.length) {
+										result.save();
+										if(written >= (total - 1)){
+											console.log("DONE!");
+										}
+									}
+								});
+						  }
+						  else {
+						  	written++;
+						  	console.log(photo.mediaurl[0]);
+						  	console.log(response);
+						  }
+					});
+			  }
+		  });
 		}
 	}).on('error', function (err) {
 	  console.log(err);
@@ -73,7 +84,7 @@ exports.ingest = function(callback) {
 }
 
 function pauseStream(stream) {
-	if((total > (written + 1000)) && !timedout) {
+	if((total > (written + 100)) && !timedout) {
 		timedout = true;
 		stream.pause();
 		setTimeout(function() {
@@ -85,3 +96,6 @@ function pauseStream(stream) {
 		stream.resume();
 	}
 }
+
+// Delete all photos that are expired records
+// Maintain home records
