@@ -31,6 +31,13 @@ exports.ingest = function() {
 			{index:31, key:'titleOne'}
 		],
 		tempFile: 'universal'
+	},{
+		filename: './data/income/ACS_13_1YR_S1903_with_ann.csv',
+		model: [
+			{index:1, key: 'nces_disid'},
+			{index:6, key: 'income'}
+		],
+		tempFile: 'income'
 	},
 	{
 		filename: './data/education/reading.csv',
@@ -51,13 +58,13 @@ exports.ingest = function() {
 	if(!fs.existsSync('tmp')) {
 		fs.mkdirSync('tmp');
 	}
-	var allKeys = [];
 	School.remove({}, function(err) { 
 		_.each(csvs, function(csv) {
 			var instream = fs.createReadStream(csv.filename);
 			var outstream = new stream;
 			var rl = readline.createInterface(instream, outstream);
 			var firstLine = true;
+			var keys = [];
 			rl.on('line', function(line) {
 				var object = {};
 				if(firstLine) {
@@ -66,15 +73,12 @@ exports.ingest = function() {
 				}
 				else {
 					if(csv.boundary) {
-						object = boundaryParser(line);
+						object = boundaryParser(line, keys);
 					}
 					else {
 						var columns = line.split(',');
 						if(!firstLine) {
 							_.each(csv.model, function(item) {
-								if(allKeys.indexOf(item.key) === -1) {
-									allKeys.push(item.key);
-								}
 								_.deepSet(object, item.key, columns[item.index]);
 							});
 						}
@@ -82,16 +86,21 @@ exports.ingest = function() {
 							firstLine = false;
 						}
 					}
+					var ncesIdFolder;
+					if(csv.tempFile === 'income') {
+						ncesIdFolder = 'tmp/' + object['nces_disid'];
+					}
+					else {
+						var folder = Math.floor(parseInt(object['nces_schid'])/100000);
+						var directory = 'tmp/' + folder.toString();
+						ncesIdFolder = directory + '/' + object['nces_schid'];
 
-					var folder = parseInt(object['nces_schid']) % 10000;
-					var directory = 'tmp/' + folder.toString();
+						if(!fs.existsSync(directory)) {
 
-					if(!fs.existsSync(directory)) {
-
-						fs.mkdirSync(directory);
+							fs.mkdirSync(directory);
+						}
 					}
 
-					var ncesIdFolder = directory + '/' + object['nces_schid'];
 					if(!fs.existsSync(ncesIdFolder)) {
 						total++;
 						fs.mkdirSync(ncesIdFolder);
@@ -112,11 +121,22 @@ exports.ingest = function() {
 					fs.readdir('tmp', function(err,folders) {
 						folders.forEach(function(folder) {
 							fs.readdir('tmp/' + folder, function(err, schools) {
+								var income = {}
+								if(fs.existsSync('tmp/' + folder + '/income.json')) {
+									try {
+										income = jf.readFileSync('tmp/' + folder + '/income.json');
+									}
+									catch(err) {
+										console.log(err);
+									}
+								}
 								schools.forEach(function(school) {
-									fs.readdir('tmp/' + folder + '/' + school, function(err, files) {
-										var object = {};
-										recursiveFileReader(folder, school, files, object);
-									});
+									if(fs.lstatSync('tmp/' + folder + '/' + school).isDirectory()) {
+										fs.readdir('tmp/' + folder + '/' + school, function(err, files) {
+											var object = {};
+											recursiveFileReader(folder, school, files, object, income);
+										});
+									}
 								})
 							});
 						});
@@ -127,7 +147,7 @@ exports.ingest = function() {
 	});
 }
 
-function boundaryParser(line, firstLine) {
+function boundaryParser(line, keys) {
 	var object = {};
 	var output = line.split('|');
 	_.each(output, function(row, i) {	
@@ -152,7 +172,7 @@ function boundaryParser(line, firstLine) {
 	return object;
 }
 
-function recursiveFileReader(folder, school, files, object) {
+function recursiveFileReader(folder, school, files, object, income) {
 	var directory = 'tmp/' + folder + '/' + school + '/' + files[0];
 	var data = {};
 	try {
@@ -167,9 +187,10 @@ function recursiveFileReader(folder, school, files, object) {
 	}
 	files.splice(0,1);
 	if(files.length > 0) {
-		recursiveFileReader(folder, school, files, object);
+		recursiveFileReader(folder, school, files, object, income);
 	}
 	else {
+		object = _.merge(object, income);
 		mongoCreate(object);
 	}
 }
@@ -180,6 +201,8 @@ function mongoCreate(object) {
 	// objects.push(object);
 	// if((objects.length % 1000 === 0) || (total-inserted) < 1000 ) {
 		School.create(object, function (err, newSchool) {
+			console.log(newSchool.income)
+			// console.log(JSON.stringify(newSchool));
 			inserted++;
 			if(total === inserted) {
 				rimraf('tmp', function() {

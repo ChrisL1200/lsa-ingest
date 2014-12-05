@@ -14,11 +14,13 @@ var SchoolSchema = new Schema({
   freeLunch: Number,
   redLunch: Number,
   member: Number,
+  income: Number,
   titleOne: String,
   stRatio: Number,
   score: {
     realEstate: Number,
-    school: Number
+    school: Number,
+    overall: Number
   },
   relver: String,
   allReading: String,
