@@ -31,8 +31,8 @@ exports.ingest = function(callback) {
 					if (!fs.existsSync(directory)){
 					    fs.mkdirSync(directory);
 					}
-					photo.storedId = directory + (photo.mediaurl[0].hashCode().toString()) + '.jpeg';
-						total++;
+					photo.storedId = directory + '/' + (photo.mediaurl[0].hashCode().toString()) + '.jpeg';
+					total++;
 					if (!fs.existsSync(directory + (photo.mediaurl[0].hashCode().toString() + '.jpeg'))) {
 						imageRequest({url: photo.mediaurl[0]}, 
 							function (error, response, body) {
@@ -71,7 +71,7 @@ function photoCallback(result) {
 	written++;
 	console.log("received: " + received + " written: " + written + " total: " + total + " homes: " + homes);
 	if(result.photosReceived === result.listing.photos[0].photo.length) {
-		result.save();
+		// result.save();
 		if(written >= (total - 1) && finished){
 			console.log("DONE!");
 		}
