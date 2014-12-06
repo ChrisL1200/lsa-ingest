@@ -7,7 +7,7 @@
 
 Place all boundary data files into data/boundary/.
 Place all education data files into data/education/.
-
+Place all income data files into data/income/
 
 In the main app folder, run npm install to begin.
 ```sh

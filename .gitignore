@@ -2,4 +2,5 @@
 npm-debug.log
 data/
 images/
+tmp/
 .DS_Store
