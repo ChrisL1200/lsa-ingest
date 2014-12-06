@@ -47,6 +47,9 @@ exports.ingest = function() {
         		scores.realEstate = (medianHome[half-1] + medianHome[half]) / 2.0;
 				}
 				
+				if(doc.income) {
+					scores.realEstate = scores.realEstate * doc.income;
+				}
 				/* School Score */
 				var lunch = (((doc.freeLunch === -2  ? 1 : doc.freeLunch) + (doc.redLunch === -2 ? 1 : doc.redLunch)) / (doc.member === -2 ? 1 : doc.member)) * 100;
 				var stRatio = doc.stRatio === 0 ? 1 : doc.stRatio;
@@ -79,13 +82,17 @@ exports.ingest = function() {
 				solMath = isNaN(solMath) ? 1 : solMath;
 				scores.school = lunch * stRatio * titleOne * solReading * solMath;
 				scores.school = isNaN(scores.school) ? 0 : scores.school;
+
+				/* Overall Score */
+				scores.overall = scores.realEstate === 0 ? 0 : scores.school / scores.realEstate;
+
 				/* Save Scores */
 				doc.score = scores;
 				doc.save(function (err, updateSchool) {
 					if(err){
 						console.log(err);
 					}
-					console.log(" written: " + written + " total: " + total);
+					process.stdout.write(" written: " + written + " total: " + total + "\r");
 					written++;
 					if((written > (total -1)) && finished){
 						process.exit();
@@ -96,7 +103,7 @@ exports.ingest = function() {
   				total++;
 					home.score = scores;
 					home.save(function (err) {
-					console.log(" written: " + written + " total: " + total);
+					process.stdout.write(" written: " + written + " total: " + total + "\r");
 						written++;
 						if((written > (total -1)) && finished){
 							process.exit();

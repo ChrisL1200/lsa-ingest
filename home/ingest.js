@@ -8,9 +8,14 @@ var lastRunDate = new Date(0);
 var imageRequest = request.defaults({
   encoding: null, pool: {maxSockets: Infinity}
 });
+var callback;
+var inserted = 0;
+var finished = false;
 
-exports.ingest = function(callback) {
+exports.ingest = function(async) {
+	callback = async;
 	console.log('Ingesting Homes...');
+	checkIfDone();
 	Home.remove({}, function(err) { 
 		var options = {
 		  url : "https://feeds.listhub.com/pickup/cruvita/cruvita.xml.gz",
@@ -35,8 +40,6 @@ exports.ingest = function(callback) {
 
 		var listing = null;
 		var ingested = 0;
-		var inserted = 0;
-		var finished = false;
 		saxStream.on("opentag", function (tag) {
 			if (tag.name !== "listing" && !listing) return
 			if(tag.name === "listing") {
@@ -49,11 +52,6 @@ exports.ingest = function(callback) {
 									console.log(err);
 								} 
 							  inserted++;
-							  // console.log("Inserted: " + inserted + " Ingested: " + ingested);
-								if(finished && (inserted === (ingested - 1))) {
-									console.log("Finished home ingest...");
-									callback();
-								}
 			        });
 		       	}
 					});
@@ -100,4 +98,17 @@ exports.ingest = function(callback) {
 		 
 		compressedRequest(options, saxStream);
 	});
+}
+
+var registeredDone = 0;
+function checkIfDone() {
+	console.log(inserted + ', ' + registeredDone);
+	if(inserted === registeredDone && finished) {
+		console.log("Homes Ingest Complete");
+		callback();
+	}
+	else {
+		registeredDone = inserted;
+		setTimeout(checkIfDone, 30000);
+	}
 }

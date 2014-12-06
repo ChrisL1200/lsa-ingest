@@ -32,7 +32,13 @@ var SchoolSchema = new Schema({
   wkt: [{
   	latitude: Number,
   	longitude: Number
-  }]
+  }],
+  address: {
+    street: String,
+    state: String,
+    city: String,
+    zip: Number
+  }
 });
 
 module.exports = mongoose.model('School', SchoolSchema);

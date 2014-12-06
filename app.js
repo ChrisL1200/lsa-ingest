@@ -3,11 +3,10 @@
  */
 
 'use strict';
-var School = require('./school/boundary');
+var School = require('./school/ingest');
 var Home = require('./home/ingest');
 var Photo = require('./photos/ingest');
 var Score = require('./score/ingest');
-var CSV = require('./csv/concat');
 var async = require('async');
 var mongoose = require('mongoose');
 // Set default node environment to development
@@ -49,9 +48,14 @@ else if(args.ingest === 'scores') {
 else if(args.ingest === 'csv') {
     CSV.ingest();
 }
-else {
+else { 
+  console.log("Complete ingest starting...");
+  console.log(new Date());
   async.parallel([School.ingest, Home.ingest], function(err, results) {
-    Photo.ingest();
-    Score.ingest();
+    async.parallel([Photo.ingest, Score.ingest], function(err, results) {
+      console.log("Finished complete ingest");
+      console.log(new Date());
+      process.exit();
+    });
   });
 }
