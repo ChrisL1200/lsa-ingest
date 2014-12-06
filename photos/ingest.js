@@ -69,7 +69,7 @@ exports.ingest = function(callback) {
 function photoCallback(result) {
 	result.photosReceived++;
 	written++;
-	console.log("received: " + received + " written: " + written + " total: " + total + " homes: " + homes);
+	process.stdout.write("received: " + received + " written: " + written + " total: " + total + " homes: " + homes + "\r");
 	if(result.photosReceived === result.listing.photos[0].photo.length) {
 		// result.save();
 		if(written >= (total - 1) && finished){
