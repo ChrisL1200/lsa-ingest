@@ -25,7 +25,7 @@ process.argv.forEach(function (val, index, array) {
 
 // Connect to database
 if(args.env === 'prod') {
-  console.log("Ingesting to Production...");  
+  console.log("Ingesting to Production...");
   mongoose.connect('mongodb://localhost/lsa');
 }
 else {
@@ -45,10 +45,7 @@ else if(args.ingest === 'photos') {
 else if(args.ingest === 'scores') {
     Score.ingest();
 }
-else if(args.ingest === 'csv') {
-    CSV.ingest();
-}
-else { 
+else {
   console.log("Complete ingest starting...");
   console.log(new Date());
   async.parallel([School.ingest, Home.ingest], function(err, results) {
