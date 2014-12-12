@@ -25,7 +25,7 @@ process.argv.forEach(function (val) {
 
 // Connect to database
 if(args.env === 'prod') {
-  console.log("Ingesting to Production...");  
+  console.log("Ingesting to Production...");
   mongoose.connect('mongodb://localhost/lsa');
 }
 else {
