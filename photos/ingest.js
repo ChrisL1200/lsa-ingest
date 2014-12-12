@@ -1,10 +1,9 @@
 var _ = require('lodash');
 var Home = require('../home/schema');
 var request = require('request');
-var async = require('async');
 var fs = require('graceful-fs');
 var imageRequest = request.defaults({
-  encoding: null, pool: {maxSockets: Infinity}
+  encoding: null, pool: {maxSockets: Infinity}, timeout: 30000
 });
 
 var homes = 0;
@@ -13,8 +12,37 @@ var written = 0;
 var total = 0;
 var timedout = false;
 var finished = false;
+var callback;
 
-exports.ingest = function(callback) {
+function photoCallback(result) {
+	result.photosReceived++;
+	written++;
+	process.stdout.write("received: " + received + " written: " + written + " total: " + total + " homes: " + homes + "\r");
+	if(result.photosReceived === result.listing.photos[0].photo.length) {
+		// result.save();
+		if(written >= (total - 1) && finished){
+			console.log("DONE!");
+			callback();
+		}
+	}
+}
+
+function pauseStream(stream) {
+	if((total > (written + 20)) && !timedout) {
+		timedout = true;
+		stream.pause();
+		setTimeout(function() {
+			timedout = false;
+	    pauseStream(stream);
+	  }, 150);
+	}
+	else {
+		stream.resume();
+	}
+}
+
+exports.ingest = function(async) {
+	callback = async;
 	console.log("Beginning photo ingest...");
 	if (!fs.existsSync('images')){
 	    fs.mkdirSync('images');
@@ -37,7 +65,7 @@ exports.ingest = function(callback) {
 						imageRequest({url: photo.mediaurl[0]}, 
 							function (error, response, body) {
 								received++;
-						    if (!error && response.statusCode == 200) {
+						    if (!error && response.statusCode === 200) {
 					        body = new Buffer(body, 'binary');
 					        fs.writeFile(photo.storedId, body, function (err) {
 					        	if (err) { 
@@ -64,46 +92,22 @@ exports.ingest = function(callback) {
 		console.log('Finished');
 		finished = true;
 	});
-}
-
-function photoCallback(result) {
-	result.photosReceived++;
-	written++;
-	process.stdout.write("received: " + received + " written: " + written + " total: " + total + " homes: " + homes + "\r");
-	if(result.photosReceived === result.listing.photos[0].photo.length) {
-		// result.save();
-		if(written >= (total - 1) && finished){
-			console.log("DONE!");
-		}
-	}
-}
-
-function pauseStream(stream) {
-	if((total > (written + 20)) && !timedout) {
-		timedout = true;
-		stream.pause();
-		setTimeout(function() {
-			timedout = false;
-	    pauseStream(stream);
-	  }, 150);
-	}
-	else {
-		stream.resume();
-	}
-}
+};
 
 String.prototype.hashCode = function(){
 	var hash = 0;
-	if (this.length == 0) return hash;
-	for (i = 0; i < this.length; i++) {
-		char = this.charCodeAt(i);
-		hash = ((hash<<5)-hash)+char;
+	if (this.length === 0) {
+		return hash;
+	}
+	for (var i = 0; i < this.length; i++) {
+		var character = this.charCodeAt(i);
+		hash = ((hash<<5)-hash)+character;
 		hash = hash & hash; // Convert to 32bit integer
 	}
 	if(hash < 0) {
 		hash = hash * -1;
 	}
 	return hash;
-}
+};
 // Delete all photos that are expired records
 // Maintain home records

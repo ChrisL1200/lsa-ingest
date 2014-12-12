@@ -16,7 +16,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 var args = {};
 // Command line args
-process.argv.forEach(function (val, index, array) {
+process.argv.forEach(function (val) {
     var argSplit = val.split('=');
     if(argSplit.length > 1) {
         args[argSplit[0]] = argSplit[1];
@@ -45,14 +45,11 @@ else if(args.ingest === 'photos') {
 else if(args.ingest === 'scores') {
     Score.ingest();
 }
-else if(args.ingest === 'csv') {
-    CSV.ingest();
-}
 else { 
   console.log("Complete ingest starting...");
   console.log(new Date());
-  async.parallel([School.ingest, Home.ingest], function(err, results) {
-    async.parallel([Photo.ingest, Score.ingest], function(err, results) {
+  async.parallel([School.ingest, Home.ingest], function() {
+    async.parallel([Photo.ingest, Score.ingest], function() {
       console.log("Finished complete ingest");
       console.log(new Date());
       process.exit();

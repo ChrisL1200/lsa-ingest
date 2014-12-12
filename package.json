@@ -39,7 +39,8 @@
     "cron": "*",
     "time": "*",
     "jsonfile": "*",
-    "rimraf": "*"
+    "rimraf": "*",
+    "memwatch": "*"
   },
   "devDependencies": {
     "grunt-contrib-jshint": "^0.10.0",
