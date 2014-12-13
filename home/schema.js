@@ -303,7 +303,9 @@ var HomeSchema = new Schema({
         },
         modificationtimestamp: [ Date ],
         disclaimer: [ String ]
-    }
+    },
+    ingestDate: Date,
+    status: String
 });
 
 

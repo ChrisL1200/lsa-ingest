@@ -40,7 +40,7 @@ else if(args.ingest === 'homes') {
     Home.ingest();
 }
 else if(args.ingest === 'photos') {
-    Photo.ingest();
+    Photo.ingest(new Date().getTime());
 }
 else if(args.ingest === 'scores') {
     Score.ingest();

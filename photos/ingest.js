@@ -19,7 +19,6 @@ function photoCallback(result) {
 	written++;
 	process.stdout.write("received: " + received + " written: " + written + " total: " + total + " homes: " + homes + "\r");
 	if(result.photosReceived === result.listing.photos[0].photo.length) {
-		// result.save();
 		if(written >= (total - 1) && finished){
 			console.log("DONE!");
 			callback();
@@ -41,13 +40,13 @@ function pauseStream(stream) {
 	}
 }
 
-exports.ingest = function(async) {
+exports.ingest = function(startDate, async) {
 	callback = async;
 	console.log("Beginning photo ingest...");
 	if (!fs.existsSync('images')){
 	    fs.mkdirSync('images');
 	}
-	var stream = Home.find().stream();
+	var stream = Home.find().where('status').ne('inactive').stream();
 	stream.on('data', function (result) {
 		homes++;
 		pauseStream(this);
@@ -61,27 +60,47 @@ exports.ingest = function(async) {
 					}
 					photo.storedId = directory + '/' + (photo.mediaurl[0].hashCode().toString()) + '.jpeg';
 					total++;
-					if (!fs.existsSync(directory + (photo.mediaurl[0].hashCode().toString() + '.jpeg'))) {
-						imageRequest({url: photo.mediaurl[0]}, 
-							function (error, response, body) {
-								received++;
-						    if (!error && response.statusCode === 200) {
-					        body = new Buffer(body, 'binary');
-					        fs.writeFile(photo.storedId, body, function (err) {
-					        	if (err) { 
-									  	console.log(err);
-									  }
-					        	photoCallback(result);
-									});
-							  }
-							  else {
-							  	written++;
-							  	console.log(photo.mediaurl[0] + " : " + error);
-							  }
-						});
+					if(result.ingestDate && result.ingestDate.getTime() > startDate) {
+						console.log("INGESTZZ");
+						if (!fs.existsSync(directory + (photo.mediaurl[0].hashCode().toString() + '.jpeg'))) {
+							imageRequest({url: photo.mediaurl[0]}, 
+								function (error, response, body) {
+									received++;
+							    if (!error && response.statusCode === 200) {
+						        body = new Buffer(body, 'binary');
+						        fs.writeFile(photo.storedId, body, function (err) {
+						        	if (err) { 
+										  	console.log(err);
+										  }
+						        	photoCallback(result);
+										});
+								  }
+								  else {
+								  	written++;
+								  	console.log(photo.mediaurl[0] + " : " + error);
+								  }
+							});
+						}
+						else {
+							photoCallback(result);
+						}
 					}
 					else {
-						photoCallback(result);
+						result.photosReceived++;
+				  	written++;
+						if(fs.existsSync(photo.storedId)) {
+							fs.unlinkSync(photo.storedId);
+							console.log("DELETED");
+						}	
+						if(result.photosReceived === result.listing.photos[0].photo.length) {
+							result.status = 'inactive';
+							result.save();
+							console.log("DEACTIVATED");
+							if(written >= (total - 1) && finished){
+								console.log("DONE!");
+								callback();
+							}
+						}
 					}
 			  }
 		  });
