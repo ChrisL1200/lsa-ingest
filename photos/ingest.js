@@ -10,6 +10,7 @@ var homes = 0;
 var received = 0;
 var written = 0;
 var total = 0;
+var registeredDone = 0;
 var timedout = false;
 var finished = false;
 var callback;
@@ -18,16 +19,16 @@ function photoCallback(result) {
 	result.photosReceived++;
 	written++;
 	process.stdout.write("received: " + received + " written: " + written + " total: " + total + " homes: " + homes + "\r");
-	if(result.photosReceived === result.listing.photos[0].photo.length) {
-		if(written >= (total - 1) && finished){
-			console.log("DONE!");
-			callback();
-		}
-	}
+	// if(result.photosReceived === result.listing.photos[0].photo.length) {
+	// 	if(written >= (total - 1) && finished){
+	// 		console.log("DONE!");
+	// 		callback();
+	// 	}
+	// }
 }
 
 function pauseStream(stream) {
-	if((total > (written + 20)) && !timedout) {
+	if((total > (received + 20)) && !timedout) {
 		timedout = true;
 		stream.pause();
 		setTimeout(function() {
@@ -37,6 +38,19 @@ function pauseStream(stream) {
 	}
 	else {
 		stream.resume();
+	}
+}
+
+function checkIfDone() {
+	console.log(written + ', ' + registeredDone);
+	if(written === registeredDone && finished) {
+		console.log("Homes Ingest Complete");
+		Photo.ingest(startDate);
+		// callback();
+	}
+	else {
+		registeredDone = written;
+		setTimeout(checkIfDone, 30000);
 	}
 }
 
@@ -61,7 +75,6 @@ exports.ingest = function(startDate, async) {
 					photo.storedId = directory + '/' + (photo.mediaurl[0].hashCode().toString()) + '.jpeg';
 					total++;
 					if(result.ingestDate && result.ingestDate.getTime() > startDate) {
-						console.log("INGESTZZ");
 						if (!fs.existsSync(directory + (photo.mediaurl[0].hashCode().toString() + '.jpeg'))) {
 							imageRequest({url: photo.mediaurl[0]}, 
 								function (error, response, body) {
@@ -90,12 +103,10 @@ exports.ingest = function(startDate, async) {
 				  	written++;
 						if(fs.existsSync(photo.storedId)) {
 							fs.unlinkSync(photo.storedId);
-							console.log("DELETED");
 						}	
 						if(result.photosReceived === result.listing.photos[0].photo.length) {
 							result.status = 'inactive';
 							result.save();
-							console.log("DEACTIVATED");
 							if(written >= (total - 1) && finished){
 								console.log("DONE!");
 								callback();
