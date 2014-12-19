@@ -42,18 +42,31 @@ function boundaryParser(line, keys) {
 }
 
 function mongoCreate(object, schoolComplete, district) {
-	School.create(object, function (err) {
-		if(err) {
-			console.log(err);
-		}
-		district.counter++;
-		schoolComplete();
-		if(district.schools.length <= district.counter) {
-			district.complete();	
-		}
-		inserted++;
-		inserting = true;
-  });
+	if(object.address && (object.address.state === 'VA' || object.address.state === 'MD' || object.address.state === 'DC' || object.address.state === 'WV')) {
+		School.create(object, function (err) {
+			if(err) {
+				console.log(err);
+			}
+			district.counter++;
+			schoolComplete();
+			if(district.schools.length <= district.counter) {
+				district.complete();	
+			}
+			inserted++;
+			inserting = true;
+	  });
+	}
+	else {
+		setTimeout(function() {
+			inserted++;
+			district.counter++;
+			schoolComplete();
+			if(district.schools.length <= district.counter) {
+				district.complete();	
+			}
+			inserting = true;
+		}, 0);
+	}
 }
 
 function recursiveFileReader(school, files, object, schoolComplete, district) {
@@ -82,16 +95,18 @@ function recursiveFileReader(school, files, object, schoolComplete, district) {
 function checkIfDone() {
 	console.log("inserted: " + inserted + " registeredDone: " + registeredDone );
 	if(inserted === registeredDone && inserting) {
-		rimraf('tmp', function() {
+		// rimraf('tmp', function() {
 			console.log("Schools Ingest Complete");
+  		console.log(new Date());
 			callback();
-		});
+		// });
 	}
 	else {
 		registeredDone = inserted;
 		setTimeout(checkIfDone, 30000);
 	}
 }
+
 exports.ingest = function(doneFunction) {
 	callback = doneFunction;
 	console.log("Ingesting Schools...");
@@ -150,62 +165,62 @@ exports.ingest = function(doneFunction) {
 		if(err) {
 			console.log(err);
 		}
-		_.each(csvs, function(csv) {
-			var instream = fs.createReadStream(csv.filename);
-			var outstream = new stream();
-			var rl = readline.createInterface(instream, outstream);
-			var firstLine = true;
-			var keys = [];
-			rl.on('line', function(line) {
-				var object = {};
-				if(firstLine) {
-					keys = line.split('|');
-					firstLine = false;
-				}
-				else {
-					if(csv.boundary) {
-						object = boundaryParser(line, keys);
-					}
-					else {
-						var columns = line.split(',');
-						if(!firstLine) {
-							_.each(csv.model, function(item) {
-								_.deepSet(object, item.key, columns[item.index]);
-							});
-						}
-						else {
-							firstLine = false;
-						}
-					}
-					var ncesIdFolder, folder;
-					if(csv.tempFile === 'income') {
-						ncesIdFolder = 'tmp/' + object['nces_disid'];
-					}
-					else {
-						folder = object['nces_schid'].substring(0,7);
-						var directory = 'tmp/' + folder.trim();
-						ncesIdFolder = directory + '/' + object['nces_schid'].trim();
+		// _.each(csvs, function(csv) {
+		// 	var instream = fs.createReadStream(csv.filename);
+		// 	var outstream = new stream();
+		// 	var rl = readline.createInterface(instream, outstream);
+		// 	var firstLine = true;
+		// 	var keys = [];
+		// 	rl.on('line', function(line) {
+		// 		var object = {};
+		// 		if(firstLine) {
+		// 			keys = line.split('|');
+		// 			firstLine = false;
+		// 		}
+		// 		else {
+		// 			if(csv.boundary) {
+		// 				object = boundaryParser(line, keys);
+		// 			}
+		// 			else {
+		// 				var columns = line.split(',');
+		// 				if(!firstLine) {
+		// 					_.each(csv.model, function(item) {
+		// 						_.deepSet(object, item.key, columns[item.index]);
+		// 					});
+		// 				}
+		// 				else {
+		// 					firstLine = false;
+		// 				}
+		// 			}
+		// 			var ncesIdFolder, folder;
+		// 			if(csv.tempFile === 'income') {
+		// 				ncesIdFolder = 'tmp/' + object['nces_disid'];
+		// 			}
+		// 			else {
+		// 				folder = object['nces_schid'].substring(0,7);
+		// 				var directory = 'tmp/' + folder.trim();
+		// 				ncesIdFolder = directory + '/' + object['nces_schid'].trim();
 
-						if(!fs.existsSync(directory)) {
-							fs.mkdirSync(directory);
-						}
-					}
+		// 				if(!fs.existsSync(directory)) {
+		// 					fs.mkdirSync(directory);
+		// 				}
+		// 			}
 
-					if(!fs.existsSync(ncesIdFolder)) {
-						total++;
-						fs.mkdirSync(ncesIdFolder);
-					}
+		// 			if(!fs.existsSync(ncesIdFolder)) {
+		// 				total++;
+		// 				fs.mkdirSync(ncesIdFolder);
+		// 			}
 
-					if(!fs.existsSync(ncesIdFolder + '/' + csv.tempFile + '.json')) {
-						jf.writeFileSync(ncesIdFolder + '/' + csv.tempFile + '.json', object); 
-					}
-				}
-			});
+		// 			if(!fs.existsSync(ncesIdFolder + '/' + csv.tempFile + '.json')) {
+		// 				jf.writeFileSync(ncesIdFolder + '/' + csv.tempFile + '.json', object); 
+		// 			}
+		// 		}
+		// 	});
 
-			rl.on('close', function() {
-				console.log("Finished " + csv.tempFile);
-				filesMapped++;
-				if(filesMapped === csvs.length) {
+		// 	rl.on('close', function() {
+		// 		console.log("Finished " + csv.tempFile);
+		// 		filesMapped++;
+		// 		if(filesMapped === csvs.length) {
 					console.log("Starting reduce phase");
 					var folders = fs.readdirSync('tmp');
 					async.eachLimit(folders, 1, function(folder, complete) {
@@ -240,9 +255,9 @@ exports.ingest = function(doneFunction) {
 							district.complete();
 						}
 					});
-					// checkIfDone();
-				}
-			});
-		});
+					checkIfDone();
+				// }
+		// 	});
+		// });
 	});
 };

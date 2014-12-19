@@ -13,6 +13,7 @@ var inside = require('point-in-polygon');
 var written = 0;
 var total = 0;
 var finished = false;
+var timedout = false;
 
 function parseTestScore(test) {
 	var testScore = parseInt(test);
@@ -28,9 +29,9 @@ function parseTestScore(test) {
 }
 
 exports.ingest = function() {
-	var stream = School.find().batchSize(500).stream();
+	var stream = School.find().stream();
 	stream.on('data', function (doc) {
-		// pauseStream(this);
+		pauseStream(this);
 		total++;
 		Home.find()
 		.where('listing.location.latitude').gt(_.min(doc.wkt, 'latitude').latitude).lt(_.max(doc.wkt, 'latitude').latitude)
@@ -110,33 +111,33 @@ exports.ingest = function() {
 
 			/* Save Scores */
 			doc.score = scores;
-			doc.save(function (err) {
-				if(err){
-					console.log(err);
-				}
-				// process.stdout.write(" written: " + written + " total: " + total + "\r");
-				written++;
-				doc = null;
-				if((written > (total -1)) && finished){
-					process.exit();
-				}
-			});
-
-			_.each(homes, function(home) {
-				total++;
-				home.score = scores;
-				home.save(function (err) {
-					if(err) {
+			setTimeout(function() {
+				doc.save(function (err) {
+					if(err){
 						console.log(err);
 					}
-				// process.stdout.write(" written: " + written + " total: " + total + "\r");
+					process.stdout.write(" written: " + written + " total: " + total + "\r");
 					written++;
 					if((written > (total -1)) && finished){
 						process.exit();
 					}
 				});
-			});
-			scores = homes = null;
+			}, 0);
+
+			// _.each(homes, function(home) {
+			// 	total++;
+			// 	home.score = scores;
+			// 	home.save(function (err) {
+			// 		if(err) {
+			// 			console.log(err);
+			// 		}
+			// 	process.stdout.write(" written: " + written + " total: " + total + "\r");
+			// 		written++;
+			// 		if((written > (total -1)) && finished){
+			// 			process.exit();
+			// 		}
+			// 	});
+			// });
 		});
 	}).on('error', function (err) {
 	  console.log(err);
@@ -146,16 +147,16 @@ exports.ingest = function() {
 	});
 };
 
-// function pauseStream(stream) {
-// 	if((total > (written + 50)) && !timedout) {
-// 		timedout = true;
-// 			stream.pause();
-// 			setTimeout(function() {
-// 				timedout = false;
-// 	    pauseStream(stream);
-// 	  }, 100);
-// 	}
-// 	else {
-// 		stream.resume();
-// 	}
-// }
+function pauseStream(stream) {
+	if((total > (written + 50)) && !timedout) {
+		timedout = true;
+			stream.pause();
+			setTimeout(function() {
+				timedout = false;
+	    pauseStream(stream);
+	  }, 100);
+	}
+	else {
+		stream.resume();
+	}
+}

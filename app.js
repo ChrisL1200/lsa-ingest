@@ -34,6 +34,7 @@ else {
 }
 
 if(args.ingest === 'schools') {
+    console.log(new Date());
     School.ingest();
 }
 else if(args.ingest === 'homes') {
