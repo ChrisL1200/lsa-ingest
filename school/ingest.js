@@ -57,7 +57,7 @@ function mongoCreate(object, schoolComplete, district) {
 	  });
 	}
 	else {
-		setTimeout(function() {
+		setImmediate(function() {
 			inserted++;
 			district.counter++;
 			schoolComplete();

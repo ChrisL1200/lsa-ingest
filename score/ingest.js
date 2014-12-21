@@ -69,7 +69,7 @@ exports.ingest = function() {
 			}
 			
 			if(doc.income) {
-				scores.realEstate = scores.realEstate * doc.income;
+				scores.realEstate = scores.realEstate / doc.income;
 			}
 
 			/* School Score */
@@ -111,7 +111,7 @@ exports.ingest = function() {
 
 			/* Save Scores */
 			doc.score = scores;
-			setTimeout(function() {
+			setImmediate(function() {
 				doc.save(function (err) {
 					if(err){
 						console.log(err);
@@ -151,7 +151,7 @@ function pauseStream(stream) {
 	if((total > (written + 50)) && !timedout) {
 		timedout = true;
 			stream.pause();
-			setTimeout(function() {
+			setImmediate(function() {
 				timedout = false;
 	    pauseStream(stream);
 	  }, 100);
