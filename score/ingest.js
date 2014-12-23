@@ -51,7 +51,7 @@ exports.ingest = function() {
 
 			var medianHome = [];
 			_.each(homes, function(home) {
-				if(home.listing.location && inside([home.listing.location[0].latitude[0], home.listing.location[0].longitude[0]], wkt)) {
+				if(home.listing.location && inside([home.listing.location.latitude, home.listing.location.longitude], wkt)) {
 					medianHome.push(home.listing.listprice[0]);
         }
 			});
@@ -61,15 +61,15 @@ exports.ingest = function() {
   			var half = Math.floor(medianHome.length/2);
 
   			if(medianHome.length % 2) {
-      		scores.realEstate = medianHome[half];
+      		doc.medianListing = medianHome[half];
       	}
   			else {
-      		scores.realEstate = (medianHome[half-1] + medianHome[half]) / 2.0;
+      		doc.medianListing = (medianHome[half-1] + medianHome[half]) / 2.0;
       	}
 			}
 			
-			if(doc.income) {
-				scores.realEstate = scores.realEstate / doc.income;
+			if(doc.income && doc.medianListing) {
+				scores.realEstate = doc.medianListing / doc.income;
 			}
 
 			/* School Score */

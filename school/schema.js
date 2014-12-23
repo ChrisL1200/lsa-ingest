@@ -24,21 +24,23 @@ var SchoolSchema = new Schema({
   },
   relver: String,
   allReading: String,
+  medianListing: Number,
   allMath: String,
   coordinates: {
     latitude: Number,
     longitude: Number
   },
   wkt: [{
-  	latitude: Number,
-  	longitude: Number
+    latitude: Number,
+    longitude: Number
   }],
   address: {
     street: String,
-    state: String,
-    city: String,
-    zip: String
+    state: { type: String, index: true },
+    city: { type: String, index: true },
+    zip: { type: String, index: true }
   }
 });
 
+SchoolSchema.set('autoIndex', false)
 module.exports = mongoose.model('School', SchoolSchema);

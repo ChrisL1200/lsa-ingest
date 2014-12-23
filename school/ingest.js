@@ -165,62 +165,62 @@ exports.ingest = function(doneFunction) {
 		if(err) {
 			console.log(err);
 		}
-		// _.each(csvs, function(csv) {
-		// 	var instream = fs.createReadStream(csv.filename);
-		// 	var outstream = new stream();
-		// 	var rl = readline.createInterface(instream, outstream);
-		// 	var firstLine = true;
-		// 	var keys = [];
-		// 	rl.on('line', function(line) {
-		// 		var object = {};
-		// 		if(firstLine) {
-		// 			keys = line.split('|');
-		// 			firstLine = false;
-		// 		}
-		// 		else {
-		// 			if(csv.boundary) {
-		// 				object = boundaryParser(line, keys);
-		// 			}
-		// 			else {
-		// 				var columns = line.split(',');
-		// 				if(!firstLine) {
-		// 					_.each(csv.model, function(item) {
-		// 						_.deepSet(object, item.key, columns[item.index]);
-		// 					});
-		// 				}
-		// 				else {
-		// 					firstLine = false;
-		// 				}
-		// 			}
-		// 			var ncesIdFolder, folder;
-		// 			if(csv.tempFile === 'income') {
-		// 				ncesIdFolder = 'tmp/' + object['nces_disid'];
-		// 			}
-		// 			else {
-		// 				folder = object['nces_schid'].substring(0,7);
-		// 				var directory = 'tmp/' + folder.trim();
-		// 				ncesIdFolder = directory + '/' + object['nces_schid'].trim();
+		_.each(csvs, function(csv) {
+			var instream = fs.createReadStream(csv.filename);
+			var outstream = new stream();
+			var rl = readline.createInterface(instream, outstream);
+			var firstLine = true;
+			var keys = [];
+			rl.on('line', function(line) {
+				var object = {};
+				if(firstLine) {
+					keys = line.split('|');
+					firstLine = false;
+				}
+				else {
+					if(csv.boundary) {
+						object = boundaryParser(line, keys);
+					}
+					else {
+						var columns = line.split(',');
+						if(!firstLine) {
+							_.each(csv.model, function(item) {
+								_.deepSet(object, item.key, columns[item.index]);
+							});
+						}
+						else {
+							firstLine = false;
+						}
+					}
+					var ncesIdFolder, folder;
+					if(csv.tempFile === 'income') {
+						ncesIdFolder = 'tmp/' + object['nces_disid'];
+					}
+					else {
+						folder = object['nces_schid'].substring(0,7);
+						var directory = 'tmp/' + folder.trim();
+						ncesIdFolder = directory + '/' + object['nces_schid'].trim();
 
-		// 				if(!fs.existsSync(directory)) {
-		// 					fs.mkdirSync(directory);
-		// 				}
-		// 			}
+						if(!fs.existsSync(directory)) {
+							fs.mkdirSync(directory);
+						}
+					}
 
-		// 			if(!fs.existsSync(ncesIdFolder)) {
-		// 				total++;
-		// 				fs.mkdirSync(ncesIdFolder);
-		// 			}
+					if(!fs.existsSync(ncesIdFolder)) {
+						total++;
+						fs.mkdirSync(ncesIdFolder);
+					}
 
-		// 			if(!fs.existsSync(ncesIdFolder + '/' + csv.tempFile + '.json')) {
-		// 				jf.writeFileSync(ncesIdFolder + '/' + csv.tempFile + '.json', object); 
-		// 			}
-		// 		}
-		// 	});
+					if(!fs.existsSync(ncesIdFolder + '/' + csv.tempFile + '.json')) {
+						jf.writeFileSync(ncesIdFolder + '/' + csv.tempFile + '.json', object); 
+					}
+				}
+			});
 
-		// 	rl.on('close', function() {
-		// 		console.log("Finished " + csv.tempFile);
-		// 		filesMapped++;
-		// 		if(filesMapped === csvs.length) {
+			rl.on('close', function() {
+				console.log("Finished " + csv.tempFile);
+				filesMapped++;
+				if(filesMapped === csvs.length) {
 					console.log("Starting reduce phase");
 					var folders = fs.readdirSync('tmp');
 					async.eachLimit(folders, 1, function(folder, complete) {
@@ -256,8 +256,8 @@ exports.ingest = function(doneFunction) {
 						}
 					});
 					checkIfDone();
-				// }
-		// 	});
-		// });
+				}
+			});
+		});
 	});
 };

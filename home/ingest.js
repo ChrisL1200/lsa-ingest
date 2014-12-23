@@ -23,6 +23,20 @@ function checkIfDone() {
 	}
 }
 
+function reformat(home) {
+	if(home.listing.address) {
+		home.listing.address = home.listing.address[0];
+		home.listing.address.city = home.listing.address.city ? home.listing.address.city[0] : undefined;
+		home.listing.address.stateorprovince = home.listing.address.stateorprovince ? home.listing.address.stateorprovince[0] : undefined;
+		home.listing.address.postalcode = home.listing.address.postalcode ? home.listing.address.postalcode[0] : undefined;
+	}
+	if(home.listing.location) {
+		home.listing.location = home.listing.location[0];
+		home.listing.location.latitude = home.listing.location.latitude ? home.listing.location.latitude[0] : undefined;
+		home.listing.location.longitude = home.listing.location.longitude ? home.listing.location.longitude[0] : undefined;
+	}
+}
+
 exports.ingest = function(async) {
 	startDate = new Date();
 	callback = async;
@@ -62,6 +76,7 @@ exports.ingest = function(async) {
 						console.log(err);
 					} 
 		  		if(result) {
+	  				reformat(result);
 		  			ingested++;
 		  			Home.findOne()
 		  			.where('listing.listingkey').equals(result.listing.listingkey[0])
