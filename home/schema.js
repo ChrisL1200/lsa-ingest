@@ -4,6 +4,11 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
 var HomeSchema = new Schema({
+    schools: {
+        elementary: { type: Schema.Types.ObjectId, ref: 'schools' },
+        middle: { type: Schema.Types.ObjectId, ref: 'schools' },
+        high: { type: Schema.Types.ObjectId, ref: 'schools' }
+    },
     listing: {
         score: {
           realEstate: Number,

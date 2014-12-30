@@ -50,9 +50,11 @@ exports.ingest = function() {
 			});
 
 			var medianHome = [];
+			var boundaryHomes = [];
 			_.each(homes, function(home) {
 				if(home.listing.location && inside([home.listing.location.latitude, home.listing.location.longitude], wkt)) {
 					medianHome.push(home.listing.listprice[0]);
+					boundaryHomes.push(home);
         }
 			});
 
@@ -124,20 +126,34 @@ exports.ingest = function() {
 				});
 			}, 0);
 
-			// _.each(homes, function(home) {
-			// 	total++;
-			// 	home.score = scores;
-			// 	home.save(function (err) {
-			// 		if(err) {
-			// 			console.log(err);
-			// 		}
-			// 	process.stdout.write(" written: " + written + " total: " + total + "\r");
-			// 		written++;
-			// 		if((written > (total -1)) && finished){
-			// 			process.exit();
-			// 		}
-			// 	});
-			// });
+			//Update homes
+			_.each(boundaryHomes, function(home) {
+				total++;
+				var edLevels = doc.ed_level.split(',');
+				_.each(edLevels, function(edLevel) {
+					switch(doc.ed_level) {
+						case 'P':
+							home.schools.elementary = doc._id;
+							break;
+						case 'M':
+							home.schools.middle = doc._id;
+							break;
+						case 'H':
+							home.schools.high = doc._id;
+							break;
+					}
+				}); 
+				home.save(function (err) {
+					if(err) {
+						console.log(err);
+					}
+					process.stdout.write(" written: " + written + " total: " + total + "\r");
+					written++;
+					if((written > (total -1)) && finished){
+						process.exit();
+					}
+				});
+			});
 		});
 	}).on('error', function (err) {
 	  console.log(err);

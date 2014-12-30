@@ -36,11 +36,12 @@ var SchoolSchema = new Schema({
   }],
   address: {
     street: String,
-    state: { type: String, index: true },
-    city: { type: String, index: true },
-    zip: { type: String, index: true }
+    state: String,
+    city: String,
+    zip: String
   }
 });
 
-SchoolSchema.set('autoIndex', false)
+SchoolSchema.index({ 'coordinates.latitude': 1, 'coordinates.longitude': 1 });
+SchoolSchema.index({ 'address.state': 1, 'address.city': 1 });
 module.exports = mongoose.model('School', SchoolSchema);
