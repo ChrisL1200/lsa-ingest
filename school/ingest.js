@@ -20,11 +20,14 @@ function boundaryParser(line, keys) {
 	var object = {};
 	var output = line.split('|');
 	_.each(output, function(row, i) {	
-		if(i !== 7) {
+		if(i !== 7 && i !== 4) {
 			object[keys[i]] = row;
 		} 
-		else {					
+		else if(i === 7) {					
 			object.wkt = [];
+			if(object['nces_schid'] === '240030000621') {
+				console.log(row);
+			}
 			var wkt = parser.parse(row).coordinates[0];
 			_.forEach(wkt, function(coord) {
 				if(coord[0] instanceof Array) {
@@ -128,6 +131,7 @@ exports.ingest = function(doneFunction) {
 			{index:22, key:'coordinates.latitude'},
 			{index:23, key:'coordinates.longitude'},
 			{index:37, key:'freeLunch'},
+			{index:30, key:'ed_level'},
 			{index:38, key:'redLunch'},
 			{index:289, key:'stRatio'},
 			{index:266, key:'member'},

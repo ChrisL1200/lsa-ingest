@@ -46,6 +46,11 @@ else if(args.ingest === 'photos') {
 else if(args.ingest === 'scores') {
     Score.ingest();
 }
+else if(args.ingest === 'daily') {
+  async.series([Home.ingest, Score.ingest], function(err, results) {
+    console.log("Finished update");
+  });
+}
 else { 
   console.log("Complete ingest starting...");
   console.log(new Date());

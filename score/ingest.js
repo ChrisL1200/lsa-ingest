@@ -129,20 +129,22 @@ exports.ingest = function() {
 			//Update homes
 			_.each(boundaryHomes, function(home) {
 				total++;
-				var edLevels = doc.ed_level.split(',');
-				_.each(edLevels, function(edLevel) {
-					switch(doc.ed_level) {
-						case 'P':
-							home.schools.elementary = doc._id;
-							break;
-						case 'M':
-							home.schools.middle = doc._id;
-							break;
-						case 'H':
-							home.schools.high = doc._id;
-							break;
-					}
-				}); 
+				if(doc.ed_level) {
+					var edLevels = doc.ed_level.split(',');
+					_.each(edLevels, function(edLevel) {
+						switch(doc.ed_level) {
+							case '1':
+								home.schools.elementary = doc._id;
+								break;
+							case '2':
+								home.schools.middle = doc._id;
+								break;
+							case '3':
+								home.schools.high = doc._id;
+								break;
+						}
+					}); 
+				}
 				home.save(function (err) {
 					if(err) {
 						console.log(err);

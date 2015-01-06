@@ -73,6 +73,8 @@ exports.ingest = function(async) {
 			if(listing) {
 		  	parseString(listing, function (err, result) {
 					if(err) {
+						// console.log(listing)
+						// console.log("XML CONVERSION ERROR:");
 						console.log(err);
 					} 
 		  		if(result) {
@@ -95,6 +97,9 @@ exports.ingest = function(async) {
 									  inserted++;
 			  					});
 			  				}
+			  				else {
+			  					inserted++;
+			  				}
 		  				}
 		  				else {
 		  					result.ingestDate = new Date();
@@ -115,7 +120,7 @@ exports.ingest = function(async) {
 	});
 
 	saxStream.on("text", function (text) {
-	  listing += text.replace(/[\n\r]/g, '\\n').replace(/&/g,"&amp;").replace(/-/g,"&#45;");
+	  listing += text.replace(/[\n\r]/g, '\\n').replace(/&/g,"&amp;").replace(/-/g,"&#45;").replace('<','&lt;').replace('>','&gt;');
 	});
 
 	saxStream.on("error", function(err) {
