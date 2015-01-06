@@ -25,9 +25,6 @@ function boundaryParser(line, keys) {
 		} 
 		else if(i === 7) {					
 			object.wkt = [];
-			if(object['nces_schid'] === '240030000621') {
-				console.log(row);
-			}
 			var wkt = parser.parse(row).coordinates[0];
 			_.forEach(wkt, function(coord) {
 				if(coord[0] instanceof Array) {
@@ -98,11 +95,11 @@ function recursiveFileReader(school, files, object, schoolComplete, district) {
 function checkIfDone() {
 	console.log("inserted: " + inserted + " registeredDone: " + registeredDone );
 	if(inserted === registeredDone && inserting) {
-		// rimraf('tmp', function() {
+		rimraf('tmp', function() {
 			console.log("Schools Ingest Complete");
   		console.log(new Date());
 			callback();
-		// });
+		});
 	}
 	else {
 		registeredDone = inserted;
