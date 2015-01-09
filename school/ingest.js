@@ -42,31 +42,32 @@ function boundaryParser(line, keys) {
 }
 
 function mongoCreate(object, schoolComplete, district) {
-	if(object.address && (object.address.state === 'VA' || object.address.state === 'MD' || object.address.state === 'DC' || object.address.state === 'WV')) {
-		School.create(object, function (err) {
-			if(err) {
-				console.log(err);
-			}
-			district.counter++;
-			schoolComplete();
-			if(district.schools.length <= district.counter) {
-				district.complete();	
-			}
-			inserted++;
-			inserting = true;
-	  });
-	}
-	else {
-		setImmediate(function() {
-			inserted++;
-			district.counter++;
-			schoolComplete();
-			if(district.schools.length <= district.counter) {
-				district.complete();	
-			}
-			inserting = true;
-		}, 0);
-	}
+	if(object.address && (object.address.state === 'VA' || object.address.state === 'MD' || object.address.state === 'DC' || object.address.state === 'WV') && !(isNaN(parseInt(object.score.overall)))) {
+		// if(!(isNaN(parseInt(object.score.overall)))) {
+			School.create(object, function (err) {
+				// if(err) {
+				// 	console.log(err);
+				// }
+				district.counter++;
+				schoolComplete();
+				if(district.schools.length <= district.counter) {
+					district.complete();	
+				}
+				inserted++;
+				inserting = true;
+		  });
+		}
+		else {
+			setImmediate(function() {
+				inserted++;
+				district.counter++;
+				schoolComplete();
+				if(district.schools.length <= district.counter) {
+					district.complete();	
+				}
+				inserting = true;
+			}, 0);
+		}
 }
 
 function recursiveFileReader(school, files, object, schoolComplete, district) {
@@ -117,22 +118,23 @@ exports.ingest = function(doneFunction) {
 		boundary: true,
 		tempFile: 'boundary'
 	},{
-		filename: './data/education/universal.csv',
+		filename: './data/education/universal2.csv',
 		model: [
 			{index:0, key: 'nces_schid'},
-			{index:7, key: 'sch_name'},
-			{index:9, key: 'address.street'},
-			{index:10, key: 'address.city'},
-			{index:11, key: 'address.state'},
-			{index:12, key: 'address.zip'},
-			{index:22, key:'coordinates.latitude'},
-			{index:23, key:'coordinates.longitude'},
-			{index:37, key:'freeLunch'},
-			{index:30, key:'ed_level'},
-			{index:38, key:'redLunch'},
-			{index:289, key:'stRatio'},
-			{index:266, key:'member'},
-			{index:31, key:'titleOne'}
+			{index:1, key: 'score.overall'},
+			{index:12, key: 'sch_name'},
+			{index:14, key: 'address.street'},
+			{index:15, key: 'address.city'},
+			{index:16, key: 'address.state'},
+			{index:17, key: 'address.zip'},
+			{index:27, key:'coordinates.latitude'},
+			{index:28, key:'coordinates.longitude'},
+			{index:42, key:'freeLunch'},
+			{index:35, key:'ed_level'},
+			{index:43, key:'redLunch'},
+			{index:294, key:'stRatio'},
+			{index:271, key:'member'},
+			{index:36, key:'titleOne'}
 		],
 		tempFile: 'universal'
 	},{

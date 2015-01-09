@@ -32,7 +32,7 @@ exports.ingest = function() {
 	var stream = School.find().stream();
 	stream.on('data', function (doc) {
 		pauseStream(this);
-		total++;
+		// total++;
 		Home.find()
 		.where('listing.location.latitude').gt(_.min(doc.wkt, 'latitude').latitude).lt(_.max(doc.wkt, 'latitude').latitude)
 		.where('listing.location.longitude').gt(_.min(doc.wkt, 'longitude').longitude).lt(_.max(doc.wkt, 'longitude').longitude)
@@ -58,73 +58,73 @@ exports.ingest = function() {
         }
 			});
 
-			if(medianHome.length > 0) {
-				medianHome.sort( function(a,b) {return a - b;} );
-  			var half = Math.floor(medianHome.length/2);
+			// if(medianHome.length > 0) {
+			// 	medianHome.sort( function(a,b) {return a - b;} );
+  	// 		var half = Math.floor(medianHome.length/2);
 
-  			if(medianHome.length % 2) {
-      		doc.medianListing = medianHome[half];
-      	}
-  			else {
-      		doc.medianListing = (medianHome[half-1] + medianHome[half]) / 2.0;
-      	}
-			}
+  	// 		if(medianHome.length % 2) {
+   //    		doc.medianListing = medianHome[half];
+   //    	}
+  	// 		else {
+   //    		doc.medianListing = (medianHome[half-1] + medianHome[half]) / 2.0;
+   //    	}
+			// }
 			
-			if(doc.income && doc.medianListing) {
-				scores.realEstate = doc.medianListing / doc.income;
-			}
+			// if(doc.income && doc.medianListing) {
+			// 	scores.realEstate = doc.medianListing / doc.income;
+			// }
 
-			/* School Score */
-			var lunch = (((doc.freeLunch === -2  ? 1 : doc.freeLunch) + (doc.redLunch === -2 ? 1 : doc.redLunch)) / (doc.member === -2 ? 1 : doc.member)) * 100;
-			var stRatio = doc.stRatio === 0 ? 1 : doc.stRatio;
+			// /* School Score */
+			// var lunch = (((doc.freeLunch === -2  ? 1 : doc.freeLunch) + (doc.redLunch === -2 ? 1 : doc.redLunch)) / (doc.member === -2 ? 1 : doc.member)) * 100;
+			// var stRatio = doc.stRatio === 0 ? 1 : doc.stRatio;
 
-			var titleOne;
-			switch(doc.titleOne) {
-				case "N":
-					titleOne = 1;
-					break;
-				case "M":
-					titleOne = 1;
-					break;
-				case "1":
-					titleOne = 100;
-					break;
-				case "2":
-					titleOne = 25;
-					break;
-				default:
-					titleOne = parseInt(doc.titleOne);
-					break;
-			}
+			// var titleOne;
+			// switch(doc.titleOne) {
+			// 	case "N":
+			// 		titleOne = 1;
+			// 		break;
+			// 	case "M":
+			// 		titleOne = 1;
+			// 		break;
+			// 	case "1":
+			// 		titleOne = 100;
+			// 		break;
+			// 	case "2":
+			// 		titleOne = 25;
+			// 		break;
+			// 	default:
+			// 		titleOne = parseInt(doc.titleOne);
+			// 		break;
+			// }
 
-			var solReading = parseTestScore(doc.allReading);
-			var solMath = parseTestScore(doc.allMath);
-			lunch = isNaN(lunch) ? 1 : lunch;
-			titleOne = isNaN(titleOne) ? 1 : titleOne;
-			stRatio = isNaN(stRatio) ? 1 : stRatio;
-			solReading = isNaN(solReading) ? 1 : solReading;
-			solMath = isNaN(solMath) ? 1 : solMath;
-			scores.school = lunch * stRatio * titleOne * solReading * solMath;
-			scores.school = isNaN(scores.school) ? 0 : scores.school;
-			solReading = solMath = lunch = titleOne = stRatio = null;
+			// var solReading = parseTestScore(doc.allReading);
+			// var solMath = parseTestScore(doc.allMath);
+			// lunch = isNaN(lunch) ? 1 : lunch;
+			// titleOne = isNaN(titleOne) ? 1 : titleOne;
+			// stRatio = isNaN(stRatio) ? 1 : stRatio;
+			// solReading = isNaN(solReading) ? 1 : solReading;
+			// solMath = isNaN(solMath) ? 1 : solMath;
+			// scores.school = lunch * stRatio * titleOne * solReading * solMath;
+			// scores.school = isNaN(scores.school) ? 0 : scores.school;
+			// solReading = solMath = lunch = titleOne = stRatio = null;
 
 			/* Overall Score */
-			scores.overall = scores.realEstate === 0 ? 0 : scores.school / scores.realEstate;
+			// scores.overall = scores.realEstate === 0 ? 0 : scores.school / scores.realEstate;
 
 			/* Save Scores */
-			doc.score = scores;
-			setImmediate(function() {
-				doc.save(function (err) {
-					if(err){
-						console.log(err);
-					}
-					process.stdout.write(" written: " + written + " total: " + total + "\r");
-					written++;
-					if((written > (total -1)) && finished){
-						process.exit();
-					}
-				});
-			}, 0);
+			// doc.score = scores;
+			// setImmediate(function() {
+			// 	doc.save(function (err) {
+			// 		if(err){
+			// 			console.log(err);
+			// 		}
+			// 		process.stdout.write(" written: " + written + " total: " + total + "\r");
+			// 		written++;
+			// 		if((written > (total -1)) && finished){
+			// 			process.exit();
+			// 		}
+			// 	});
+			// }, 0);
 
 			//Update homes
 			_.each(boundaryHomes, function(home) {
